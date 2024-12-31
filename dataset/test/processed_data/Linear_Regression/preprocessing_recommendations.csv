@@ -1,0 +1,16 @@
+Preprocessing Reason
+Categorical: Most_frequent Imputation
+Numerical: Mean Imputation | Outliers handled with Z-Score Filtering (threshold=3) | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Mean Imputation | Outliers handled with Z-Score Filtering (threshold=3) | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Mean Imputation | Outliers handled with Z-Score Filtering (threshold=3) | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Mean Imputation | Outliers handled with Z-Score Filtering (threshold=3) | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Mean Imputation | Outliers handled with Z-Score Filtering (threshold=3) | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Mean Imputation | Outliers handled with Z-Score Filtering (threshold=3) | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Mean Imputation | Outliers handled with Z-Score Filtering (threshold=3) | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Mean Imputation | Outliers handled with Z-Score Filtering (threshold=3) | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Mean Imputation | Outliers handled with Z-Score Filtering (threshold=3) | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Mean Imputation | Outliers handled with Z-Score Filtering (threshold=3) | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Mean Imputation | Outliers handled with Z-Score Filtering (threshold=3) | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Mean Imputation | Outliers handled with Z-Score Filtering (threshold=3) | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Mean Imputation | Outliers handled with Z-Score Filtering (threshold=3) | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Mean Imputation | Outliers handled with Z-Score Filtering (threshold=3) | Outliers handled with IQR Filtering (multiplier=1.5)

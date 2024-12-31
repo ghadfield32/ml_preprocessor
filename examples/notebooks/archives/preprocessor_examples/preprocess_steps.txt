@@ -1,46 +1,9 @@
-# ml_preprocessor
-Automated preprocessing and inverse preprocessing utilities for machine learning models.
 
 # **Comprehensive Guide to Enhanced Data Preprocessing Pipeline**
 
-## Table of Contents
+## **Overview of Goals and Steps**
 
-- [**Comprehensive Guide to Enhanced Data Preprocessing Pipeline**](#comprehensive-guide-to-enhanced-data-preprocessing-pipeline)
-  - [Table of Contents](#table-of-contents)
-  - [Overview of Goals and Steps](#overview-of-goals-and-steps)
-    - [Primary Scenarios](#primary-scenarios)
-    - [Preprocessing Steps](#preprocessing-steps)
-  - [Model Types Classification](#model-types-classification)
-  - [Detailed Step-by-Step Guide](#detailed-step-by-step-guide)
-    - [1. Initialize Preprocessor and Configure Options](#1-initialize-preprocessor-and-configure-options)
-    - [2. Split Dataset into Train/Test and X/y](#2-split-dataset-into-traintest-and-xy)
-    - [3. Handle Missing Values](#3-handle-missing-values)
-    - [4. Test for Normality](#4-test-for-normality)
-    - [5. Handle Outliers](#5-handle-outliers)
-    - [6. Choose and Apply Transformations (Based on Normality Tests)](#6-choose-and-apply-transformations-based-on-normality-tests)
-    - [7. Encode Categorical Variables](#7-encode-categorical-variables)
-    - [8. Apply Scaling (If Needed by Model)](#8-apply-scaling-if-needed-by-model)
-    - [9. Implement SMOTE (Train Only)](#9-implement-smote-train-only)
-    - [10. Train Model on Preprocessed Training Data](#10-train-model-on-preprocessed-training-data)
-    - [11. Predict on Test Data (No SMOTE on Test)](#11-predict-on-test-data-no-smote-on-test)
-    - [12. Final Inverse Transformations for Interpretability](#12-final-inverse-transformations-for-interpretability)
-    - [13. Final Inverse Transformation Validation](#13-final-inverse-transformation-validation)
-  - [Automated Output Datasets](#automated-output-datasets)
-    - [Training Mode](#training-mode)
-    - [Prediction Mode](#prediction-mode)
-    - [Clustering Mode](#clustering-mode)
-  - [SMOTE Calculations for Numericals](#smote-calculations-for-numericals)
-  - [Final Verification and Readiness for K-Means Clustering](#final-verification-and-readiness-for-k-means-clustering)
-- [**Usage Example**](#usage-example)
-  - [**Contribution Guidelines**](#contribution-guidelines)
-  - [**License**](#license)
-  - [**Contact**](#contact)
-
----
-
-## Overview of Goals and Steps
-
-### Primary Scenarios
+### **Primary Scenarios:**
 
 1. **Training and Testing Preparation:**
    - Preprocess data to obtain split datasets (`X_train_preprocessed`, `X_test_preprocessed`, `y_train`, `y_test`) ready for model training and evaluation.
@@ -51,7 +14,7 @@ Automated preprocessing and inverse preprocessing utilities for machine learning
 3. **Clustering Preparation:**
    - Preprocess data (`X_preprocessed`) tailored for unsupervised clustering algorithms like K-Means, ensuring appropriate scaling and encoding.
 
-### Preprocessing Steps
+### **Preprocessing Steps:**
 
 1. **Initialize Preprocessor and Configure Options**
 2. **Split Dataset into Train/Test and X/y**
@@ -69,9 +32,9 @@ Automated preprocessing and inverse preprocessing utilities for machine learning
 
 ---
 
-## Model Types Classification
+## **Model Types Classification**
 
-Before delving into each preprocessing step, it's essential to categorize common model types to understand their preprocessing requirements better:
+Before delving into each preprocessing step, let's categorize common model types to understand their preprocessing requirements better:
 
 | **Model Type**                   | **Category**         | **Requires y** | **Notes**                                                                                   |
 |----------------------------------|----------------------|-----------------|---------------------------------------------------------------------------------------------|
@@ -87,11 +50,11 @@ Before delving into each preprocessing step, it's essential to categorize common
 
 ---
 
-## Detailed Step-by-Step Guide
+## **Detailed Step-by-Step Guide**
 
 We'll adjust each preprocessing step to accommodate supervised models (classification and regression) and unsupervised clustering algorithms like K-Means. This ensures preprocessing aligns with the requirements of different model types.
 
-### 1. Initialize Preprocessor and Configure Options
+### **1. Initialize Preprocessor and Configure Options**
 
 **Goal:**
 Set up the preprocessing pipeline with necessary configurations, including model type, operational mode, and preprocessing options.
@@ -103,9 +66,6 @@ Set up the preprocessing pipeline with necessary configurations, including model
 **Implementation Example:**
 
 ```python
-import logging
-from typing import Dict, List, Optional
-
 class DataPreprocessor:
     def __init__(
         self,
@@ -205,60 +165,6 @@ class DataPreprocessor:
         handler.setFormatter(formatter)
         if not self.logger.handlers:
             self.logger.addHandler(handler)
-    
-    def map_model_type_to_category(self):
-        """
-        Map the model_type to its corresponding category.
-
-        Returns:
-            str: Category of the model.
-        """
-        classification_models = [
-            'Logistic Regression',
-            'Decision Trees',
-            'Random Forest',
-            'Gradient Boosting',
-            'SVM',
-            'k-NN',
-            'Neural Networks'
-        ]
-        regression_models = [
-            'Linear Regression'
-        ]
-        tree_based_models = [
-            'Decision Trees',
-            'Random Forest',
-            'Gradient Boosting'
-        ]
-        svm_based_models = [
-            'SVM'
-        ]
-        distance_based_models = [
-            'k-NN'
-        ]
-        neural_network_models = [
-            'Neural Networks'
-        ]
-        unsupervised_models = [
-            'Clustering Algorithms'
-        ]
-
-        if self.model_type in regression_models:
-            return 'regression'
-        elif self.model_type in classification_models:
-            return 'classification'
-        elif self.model_type in tree_based_models:
-            return 'tree_based_models'
-        elif self.model_type in svm_based_models:
-            return 'svm_based'
-        elif self.model_type in distance_based_models:
-            return 'distance_based'
-        elif self.model_type in neural_network_models:
-            return 'neural_networks'
-        elif self.model_type in unsupervised_models:
-            return 'clustering'
-        else:
-            return 'unknown'
 ```
 
 **Options:**
@@ -269,7 +175,7 @@ class DataPreprocessor:
 
 ---
 
-### 2. Split Dataset into Train/Test and X/y
+### **2. Split Dataset into Train/Test and X/y**
 
 **Goal:**
 Divide the dataset into training and testing subsets to ensure unbiased model evaluation and prevent data leakage.
@@ -290,106 +196,96 @@ Divide the dataset into training and testing subsets to ensure unbiased model ev
 
 ```python
 from sklearn.model_selection import train_test_split
-import pandas as pd
-from typing import Tuple, Optional
 
-class DataPreprocessor:
-    # ... [Previous code]
+def split_dataset(self, X: pd.DataFrame, y: Optional[pd.Series] = None, debug: bool = False) -> Tuple[pd.DataFrame, Optional[pd.DataFrame], Optional[pd.Series], Optional[pd.Series]]:
+    """
+    Split the dataset into training and testing sets while retaining original indices.
 
-    def split_dataset(
-        self, 
-        X: pd.DataFrame, 
-        y: Optional[pd.Series] = None, 
-        debug: bool = False
-    ) -> Tuple[pd.DataFrame, Optional[pd.DataFrame], Optional[pd.Series], Optional[pd.Series]]:
-        """
-        Split the dataset into training and testing sets while retaining original indices.
+    Args:
+        X (pd.DataFrame): Features.
+        y (Optional[pd.Series]): Target variable.
+        debug (bool): Flag to control debug outputs.
 
-        Args:
-            X (pd.DataFrame): Features.
-            y (Optional[pd.Series]): Target variable.
-            debug (bool): Flag to control debug outputs.
+    Returns:
+        Tuple[pd.DataFrame, Optional[pd.DataFrame], Optional[pd.Series], Optional[pd.Series]]: X_train, X_test, y_train, y_test
+    """
+    step_name = "Split Dataset into Train and Test"
+    self.logger.info(f"Step: {step_name}")
 
-        Returns:
-            Tuple[pd.DataFrame, Optional[pd.DataFrame], Optional[pd.Series], Optional[pd.Series]]: X_train, X_test, y_train, y_test
-        """
-        step_name = "Split Dataset into Train and Test"
-        self.logger.info(f"Step: {step_name}")
-
-        # Debugging Statements
-        if debug:
-            self.logger.debug(f"Before Split - X shape: {X.shape}")
-            if y is not None:
-                self.logger.debug(f"Before Split - y shape: {y.shape}")
-            else:
-                self.logger.debug("Before Split - y is None")
-
-        # Determine splitting based on mode
-        if self.mode == 'train' and self.model_category in ['classification', 'regression']:
-            if self.model_category == 'classification':
-                stratify = y if self.options.get('split_dataset', {}).get('stratify_for_classification', False) else None
-                test_size = self.options.get('split_dataset', {}).get('test_size', 0.2)
-                random_state = self.options.get('split_dataset', {}).get('random_state', 42)
-                X_train, X_test, y_train, y_test = train_test_split(
-                    X, y,
-                    test_size=test_size,
-                    stratify=stratify,
-                    random_state=random_state
-                )
-                if debug:
-                    self.logger.debug("Performed stratified split for classification.")
-            elif self.model_category == 'regression':
-                test_size = self.options.get('split_dataset', {}).get('test_size', 0.2)
-                random_state = self.options.get('split_dataset', {}).get('random_state', 42)
-                X_train, X_test, y_train, y_test = train_test_split(
-                    X, y,
-                    test_size=test_size,
-                    random_state=random_state
-                )
-                if debug:
-                    self.logger.debug("Performed random split for regression.")
+    # Debugging Statements
+    if debug:
+        self.logger.debug(f"Before Split - X shape: {X.shape}")
+        if y is not None:
+            self.logger.debug(f"Before Split - y shape: {y.shape}")
         else:
-            # For 'predict' and 'clustering' modes or other categories
-            X_train = X.copy()
-            X_test = None
-            y_train = y.copy() if y is not None else None
-            y_test = None
-            self.logger.info(f"No splitting performed for mode '{self.mode}' or model category '{self.model_category}'.")
+            self.logger.debug("Before Split - y is None")
 
-        self.preprocessing_steps.append("Split Dataset into Train and Test")
-
-        # Keep Indices Aligned Through Each Step
-        if X_test is not None and y_test is not None:
-            # Sort both X_test and y_test by index
-            X_test = X_test.sort_index()
-            y_test = y_test.sort_index()
+    # Determine splitting based on mode
+    if self.mode == 'train' and self.model_category in ['classification', 'regression']:
+        if self.model_category == 'classification':
+            stratify = y if self.options.get('split_dataset', {}).get('stratify_for_classification', False) else None
+            test_size = self.options.get('split_dataset', {}).get('test_size', 0.2)
+            random_state = self.options.get('split_dataset', {}).get('random_state', 42)
+            X_train, X_test, y_train, y_test = train_test_split(
+                X, y,
+                test_size=test_size,
+                stratify=stratify,
+                random_state=random_state
+            )
             if debug:
-                self.logger.debug("Sorted X_test and y_test by index for alignment.")
+                self.logger.debug("Performed stratified split for classification.")
+        elif self.model_category == 'regression':
+            test_size = self.options.get('split_dataset', {}).get('test_size', 0.2)
+            random_state = self.options.get('split_dataset', {}).get('random_state', 42)
+            X_train, X_test, y_train, y_test = train_test_split(
+                X, y,
+                test_size=test_size,
+                random_state=random_state
+            )
+            if debug:
+                self.logger.debug("Performed random split for regression.")
+    else:
+        # For 'predict' and 'clustering' modes or other categories
+        X_train = X.copy()
+        X_test = None
+        y_train = y.copy() if y is not None else None
+        y_test = None
+        self.logger.info(f"No splitting performed for mode '{self.mode}' or model category '{self.model_category}'.")
 
-        # Debugging: Log post-split shapes and index alignment
+    self.preprocessing_steps.append("Split Dataset into Train and Test")
+
+    # Keep Indices Aligned Through Each Step
+    if X_test is not None and y_test is not None:
+        # Sort both X_test and y_test by index
+        X_test = X_test.sort_index()
+        y_test = y_test.sort_index()
         if debug:
-            self.logger.debug(f"After Split - X_train shape: {X_train.shape}, X_test shape: {X_test.shape if X_test is not None else 'N/A'}")
-            if self.model_category == 'classification' and y_train is not None and y_test is not None:
-                self.logger.debug(f"Class distribution in y_train:\n{y_train.value_counts(normalize=True)}")
-                self.logger.debug(f"Class distribution in y_test:\n{y_test.value_counts(normalize=True)}")
-            elif self.model_category == 'regression' and y_train is not None and y_test is not None:
-                self.logger.debug(f"y_train statistics:\n{y_train.describe()}")
-                self.logger.debug(f"y_test statistics:\n{y_test.describe()}")
+            self.logger.debug("Sorted X_test and y_test by index for alignment.")
 
-        # Check index alignment
-        if y_train is not None and X_train.index.equals(y_train.index):
-            if debug:
-                self.logger.debug("X_train and y_train indices are aligned.")
-        else:
-            self.logger.warning("X_train and y_train indices are misaligned.")
+    # Debugging: Log post-split shapes and index alignment
+    if debug:
+        self.logger.debug(f"After Split - X_train shape: {X_train.shape}, X_test shape: {X_test.shape if X_test is not None else 'N/A'}")
+        if self.model_category == 'classification' and y_train is not None and y_test is not None:
+            self.logger.debug(f"Class distribution in y_train:\n{y_train.value_counts(normalize=True)}")
+            self.logger.debug(f"Class distribution in y_test:\n{y_test.value_counts(normalize=True)}")
+        elif self.model_category == 'regression' and y_train is not None and y_test is not None:
+            self.logger.debug(f"y_train statistics:\n{y_train.describe()}")
+            self.logger.debug(f"y_test statistics:\n{y_test.describe()}")
 
-        if X_test is not None and y_test is not None and X_test.index.equals(y_test.index):
-            if debug:
-                self.logger.debug("X_test and y_test indices are aligned.")
-        elif X_test is not None and y_test is not None:
-            self.logger.warning("X_test and y_test indices are misaligned.")
+    # Check index alignment
+    if y_train is not None and X_train.index.equals(y_train.index):
+        if debug:
+            self.logger.debug("X_train and y_train indices are aligned.")
+    else:
+        self.logger.warning("X_train and y_train indices are misaligned.")
 
-        return X_train, X_test, y_train, y_test
+    if X_test is not None and y_test is not None and X_test.index.equals(y_test.index):
+        if debug:
+            self.logger.debug("X_test and y_test indices are aligned.")
+    elif X_test is not None and y_test is not None:
+        self.logger.warning("X_test and y_test indices are misaligned.")
+
+    return X_train, X_test, y_train, y_test
 ```
 
 **Options:**
@@ -400,7 +296,7 @@ class DataPreprocessor:
 
 ---
 
-### 3. Handle Missing Values
+### **3. Handle Missing Values**
 
 **Goal:**
 Impute missing values appropriately to maintain data integrity.
@@ -422,117 +318,107 @@ Impute missing values appropriately to maintain data integrity.
 
 ```python
 from sklearn.impute import SimpleImputer, KNNImputer
-import pandas as pd
-from typing import Tuple, Optional
 
-class DataPreprocessor:
-    # ... [Previous code]
+def handle_missing_values(self, X_train: pd.DataFrame, X_test: Optional[pd.DataFrame] = None, debug: bool = False) -> Tuple[pd.DataFrame, Optional[pd.DataFrame]]:
+    """
+    Handle missing values for numerical and categorical features based on user options.
 
-    def handle_missing_values(
-        self, 
-        X_train: pd.DataFrame, 
-        X_test: Optional[pd.DataFrame] = None, 
-        debug: bool = False
-    ) -> Tuple[pd.DataFrame, Optional[pd.DataFrame]]:
-        """
-        Handle missing values for numerical and categorical features based on user options.
+    Args:
+        X_train (pd.DataFrame): Training features.
+        X_test (Optional[pd.DataFrame]): Testing features.
+        debug (bool): Flag to control debug outputs.
 
-        Args:
-            X_train (pd.DataFrame): Training features.
-            X_test (Optional[pd.DataFrame]): Testing features.
-            debug (bool): Flag to control debug outputs.
+    Returns:
+        Tuple[pd.DataFrame, Optional[pd.DataFrame]]: Imputed X_train and X_test.
+    """
+    step_name = "Handle Missing Values"
+    self.logger.info(f"Step: {step_name}")
 
-        Returns:
-            Tuple[pd.DataFrame, Optional[pd.DataFrame]]: Imputed X_train and X_test.
-        """
-        step_name = "Handle Missing Values"
-        self.logger.info(f"Step: {step_name}")
+    new_columns = []
 
-        new_columns = []
+    # Fetch user-defined imputation options or set defaults
+    impute_options = self.options.get('handle_missing_values', {})
+    numerical_strategy = impute_options.get('numerical_strategy', {})
+    categorical_strategy = impute_options.get('categorical_strategy', {})
 
-        # Fetch user-defined imputation options or set defaults
-        impute_options = self.options.get('handle_missing_values', {})
-        numerical_strategy = impute_options.get('numerical_strategy', {})
-        categorical_strategy = impute_options.get('categorical_strategy', {})
-
-        # Numerical Imputation
-        numerical_imputer = None
-        if self.numericals:
-            if self.model_category in ['regression', 'classification', 'clustering']:
-                default_num_strategy = 'mean'  # For clustering, mean imputation is acceptable
-            else:
-                default_num_strategy = 'median'
-            num_strategy = numerical_strategy.get('strategy', default_num_strategy)
-            num_imputer_type = numerical_strategy.get('imputer', 'SimpleImputer')  # Can be 'SimpleImputer', 'KNNImputer', etc.
-
-            if debug:
-                self.logger.debug(f"Numerical Imputation Strategy: {num_strategy.capitalize()}, Imputer Type: {num_imputer_type}")
-
-            # Initialize numerical imputer based on user option
-            if num_imputer_type == 'SimpleImputer':
-                numerical_imputer = SimpleImputer(strategy=num_strategy)
-            elif num_imputer_type == 'KNNImputer':
-                knn_neighbors = numerical_strategy.get('knn_neighbors', 5)
-                numerical_imputer = KNNImputer(n_neighbors=knn_neighbors)
-            else:
-                self.logger.error(f"Numerical imputer type '{num_imputer_type}' is not supported.")
-                raise ValueError(f"Numerical imputer type '{num_imputer_type}' is not supported.")
-
-            # Fit and transform ONLY on X_train
-            X_train[self.numericals] = numerical_imputer.fit_transform(X_train[self.numericals])
-            self.numerical_imputer = numerical_imputer  # Assign to self for saving
-            self.feature_reasons.update({col: self.feature_reasons.get(col, '') + f'Numerical: {num_strategy.capitalize()} Imputation | ' for col in self.numericals})
-            new_columns.extend(self.numericals)
-
-            if X_test is not None:
-                # Transform ONLY on X_test without fitting
-                X_test[self.numericals] = numerical_imputer.transform(X_test[self.numericals])
-
-        # Categorical Imputation
-        categorical_imputer = None
-        all_categoricals = self.ordinal_categoricals + self.nominal_categoricals
-        if all_categoricals:
-            default_cat_strategy = 'most_frequent'
-            cat_strategy = categorical_strategy.get('strategy', default_cat_strategy)
-            cat_imputer_type = categorical_strategy.get('imputer', 'SimpleImputer')
-
-            if debug:
-                self.logger.debug(f"Categorical Imputation Strategy: {cat_strategy.capitalize()}, Imputer Type: {cat_imputer_type}")
-
-            # Initialize categorical imputer based on user option
-            if cat_imputer_type == 'SimpleImputer':
-                categorical_imputer = SimpleImputer(strategy=cat_strategy)
-            elif cat_imputer_type == 'ConstantImputer':
-                fill_value = categorical_strategy.get('fill_value', 'Missing')
-                categorical_imputer = SimpleImputer(strategy='constant', fill_value=fill_value)
-            else:
-                self.logger.error(f"Categorical imputer type '{cat_imputer_type}' is not supported.")
-                raise ValueError(f"Categorical imputer type '{cat_imputer_type}' is not supported.")
-
-            # Fit and transform ONLY on X_train
-            X_train[all_categoricals] = categorical_imputer.fit_transform(X_train[all_categoricals])
-            self.categorical_imputer = categorical_imputer  # Assign to self for saving
-            self.feature_reasons.update({
-                col: self.feature_reasons.get(col, '') + (f'Categorical: Constant Imputation (Value={categorical_strategy.get("fill_value", "Missing")}) | ' if cat_imputer_type == 'ConstantImputer' else f'Categorical: {cat_strategy.capitalize()} Imputation | ')
-                for col in all_categoricals
-            })
-            new_columns.extend(all_categoricals)
-
-            if X_test is not None:
-                # Transform ONLY on X_test without fitting
-                X_test[all_categoricals] = categorical_imputer.transform(X_test[all_categoricals])
-
-        self.preprocessing_steps.append("Handle Missing Values")
-
-        # Completion Logging
-        if debug:
-            self.logger.debug(f"Completed: Handle Missing Values. Dataset shape after imputation: {X_train.shape}")
-            self.logger.debug(f"Missing values after imputation in X_train:\n{X_train.isnull().sum()}")
-            self.logger.debug(f"New columns handled: {new_columns}")
+    # Numerical Imputation
+    numerical_imputer = None
+    if self.numericals:
+        if self.model_category in ['regression', 'classification', 'clustering']:
+            default_num_strategy = 'mean'  # For clustering, mean imputation is acceptable
         else:
-            self.logger.info(f"Step '{step_name}' completed.")
+            default_num_strategy = 'median'
+        num_strategy = numerical_strategy.get('strategy', default_num_strategy)
+        num_imputer_type = numerical_strategy.get('imputer', 'SimpleImputer')  # Can be 'SimpleImputer', 'KNNImputer', etc.
 
-        return X_train, X_test
+        if debug:
+            self.logger.debug(f"Numerical Imputation Strategy: {num_strategy.capitalize()}, Imputer Type: {num_imputer_type}")
+
+        # Initialize numerical imputer based on user option
+        if num_imputer_type == 'SimpleImputer':
+            numerical_imputer = SimpleImputer(strategy=num_strategy)
+        elif num_imputer_type == 'KNNImputer':
+            knn_neighbors = numerical_strategy.get('knn_neighbors', 5)
+            numerical_imputer = KNNImputer(n_neighbors=knn_neighbors)
+        else:
+            self.logger.error(f"Numerical imputer type '{num_imputer_type}' is not supported.")
+            raise ValueError(f"Numerical imputer type '{num_imputer_type}' is not supported.")
+
+        # Fit and transform ONLY on X_train
+        X_train[self.numericals] = numerical_imputer.fit_transform(X_train[self.numericals])
+        self.numerical_imputer = numerical_imputer  # Assign to self for saving
+        self.feature_reasons.update({col: self.feature_reasons.get(col, '') + f'Numerical: {num_strategy.capitalize()} Imputation | ' for col in self.numericals})
+        new_columns.extend(self.numericals)
+
+        if X_test is not None:
+            # Transform ONLY on X_test without fitting
+            X_test[self.numericals] = numerical_imputer.transform(X_test[self.numericals])
+
+    # Categorical Imputation
+    categorical_imputer = None
+    all_categoricals = self.ordinal_categoricals + self.nominal_categoricals
+    if all_categoricals:
+        default_cat_strategy = 'most_frequent'
+        cat_strategy = categorical_strategy.get('strategy', default_cat_strategy)
+        cat_imputer_type = categorical_strategy.get('imputer', 'SimpleImputer')
+
+        if debug:
+            self.logger.debug(f"Categorical Imputation Strategy: {cat_strategy.capitalize()}, Imputer Type: {cat_imputer_type}")
+
+        # Initialize categorical imputer based on user option
+        if cat_imputer_type == 'SimpleImputer':
+            categorical_imputer = SimpleImputer(strategy=cat_strategy)
+        elif cat_imputer_type == 'ConstantImputer':
+            fill_value = categorical_strategy.get('fill_value', 'Missing')
+            categorical_imputer = SimpleImputer(strategy='constant', fill_value=fill_value)
+        else:
+            self.logger.error(f"Categorical imputer type '{cat_imputer_type}' is not supported.")
+            raise ValueError(f"Categorical imputer type '{cat_imputer_type}' is not supported.")
+
+        # Fit and transform ONLY on X_train
+        X_train[all_categoricals] = categorical_imputer.fit_transform(X_train[all_categoricals])
+        self.categorical_imputer = categorical_imputer  # Assign to self for saving
+        self.feature_reasons.update({
+            col: self.feature_reasons.get(col, '') + (f'Categorical: Constant Imputation (Value={categorical_strategy.get("fill_value", "Missing")}) | ' if cat_imputer_type == 'ConstantImputer' else f'Categorical: {cat_strategy.capitalize()} Imputation | ')
+            for col in all_categoricals
+        })
+        new_columns.extend(all_categoricals)
+
+        if X_test is not None:
+            # Transform ONLY on X_test without fitting
+            X_test[all_categoricals] = categorical_imputer.transform(X_test[all_categoricals])
+
+    self.preprocessing_steps.append("Handle Missing Values")
+
+    # Completion Logging
+    if debug:
+        self.logger.debug(f"Completed: Handle Missing Values. Dataset shape after imputation: {X_train.shape}")
+        self.logger.debug(f"Missing values after imputation in X_train:\n{X_train.isnull().sum()}")
+        self.logger.debug(f"New columns handled: {new_columns}")
+    else:
+        self.logger.info(f"Step '{step_name}' completed.")
+
+    return X_train, X_test
 ```
 
 **Options:**
@@ -571,7 +457,7 @@ class DataPreprocessor:
 
 ---
 
-### 4. Test for Normality
+### **4. Test for Normality**
 
 **Goal:**
 Determine if feature distributions meet model assumptions regarding normality.
@@ -590,95 +476,88 @@ Determine if feature distributions meet model assumptions regarding normality.
 **Implementation Example:**
 
 ```python
-from scipy.stats import shapiro, skew, anderson
-import pandas as pd
-from typing import Dict
+from scipy.stats import shapiro, skew
 
-class DataPreprocessor:
-    # ... [Previous code]
+def test_normality(self, X_train: pd.DataFrame, debug: bool = False) -> Dict[str, Dict]:
+    """
+    Test normality for numerical features based on normality tests and user options.
 
-    def test_normality(
-        self, 
-        X_train: pd.DataFrame, 
-        debug: bool = False
-    ) -> Dict[str, Dict]:
-        """
-        Test normality for numerical features based on normality tests and user options.
+    Args:
+        X_train (pd.DataFrame): Training features.
+        debug (bool): Flag to control debug outputs.
 
-        Args:
-            X_train (pd.DataFrame): Training features.
-            debug (bool): Flag to control debug outputs.
+    Returns:
+        Dict[str, Dict]: Dictionary with normality test results for each numerical feature.
+    """
+    step_name = "Test for Normality"
+    self.logger.info(f"Step: {step_name}")
+    normality_results = {}
 
-        Returns:
-            Dict[str, Dict]: Dictionary with normality test results for each numerical feature.
-        """
-        step_name = "Test for Normality"
-        self.logger.info(f"Step: {step_name}")
-        normality_results = {}
+    # Fetch user-defined normality test options or set defaults
+    normality_options = self.options.get('test_normality', {})
+    p_value_threshold = normality_options.get('p_value_threshold', 0.05)
+    skewness_threshold = normality_options.get('skewness_threshold', 1.0)
+    additional_tests = normality_options.get('additional_tests', [])  # e.g., ['anderson-darling']
 
-        # Fetch user-defined normality test options or set defaults
-        normality_options = self.options.get('test_normality', {})
-        p_value_threshold = normality_options.get('p_value_threshold', 0.05)
-        skewness_threshold = normality_options.get('skewness_threshold', 1.0)
-        additional_tests = normality_options.get('additional_tests', [])  # e.g., ['anderson-darling']
+    for col in self.numericals:
+        data = X_train[col].dropna()
+        skewness = data.skew()
+        kurtosis = data.kurtosis()
 
-        for col in self.numericals:
-            data = X_train[col].dropna()
-            skewness = data.skew()
-            kurtosis = data.kurtosis()
+        # Determine which normality test to use based on sample size and user options
+        test_used = 'Shapiro-Wilk'
+        p_value = 0.0
 
-            # Determine which normality test to use based on sample size and user options
+        if len(data) <= 5000:
+            from scipy.stats import shapiro
+            stat, p_val = shapiro(data)
             test_used = 'Shapiro-Wilk'
-            p_value = 0.0
+            p_value = p_val
+        else:
+            from scipy.stats import anderson
+            result = anderson(data)
+            test_used = 'Anderson-Darling'
+            # Determine p-value based on critical values
+            p_value = 0.0  # Default to 0
+            for cv, sig in zip(result.critical_values, result.significance_level):
+                if result.statistic < cv:
+                    p_value = sig / 100
+                    break
 
-            if len(data) <= 5000:
-                stat, p_val = shapiro(data)
-                test_used = 'Shapiro-Wilk'
-                p_value = p_val
-            else:
-                result = anderson(data)
-                test_used = 'Anderson-Darling'
-                # Determine p-value based on critical values
-                p_value = 0.0  # Default to 0
-                for cv, sig in zip(result.critical_values, result.significance_level):
-                    if result.statistic < cv:
-                        p_value = sig / 100
-                        break
-
-            # Apply user-defined or default criteria
-            if self.model_category in ['regression', 'classification', 'clustering']:
-                # Linear, Logistic Regression, and Clustering: Use p-value and skewness
+        # Apply user-defined or default criteria
+        if self.model_category in ['regression', 'classification', 'clustering']:
+            # Linear, Logistic Regression, and Clustering: Use p-value and skewness
+            needs_transform = (p_value < p_value_threshold) or (abs(skewness) > skewness_threshold)
+        else:
+            # Other models: Use skewness, and optionally p-values based on options
+            use_p_value = normality_options.get('use_p_value_other_models', False)
+            if use_p_value:
                 needs_transform = (p_value < p_value_threshold) or (abs(skewness) > skewness_threshold)
             else:
-                # Other models: Use skewness, and optionally p-values based on options
-                use_p_value = normality_options.get('use_p_value_other_models', False)
-                if use_p_value:
-                    needs_transform = (p_value < p_value_threshold) or (abs(skewness) > skewness_threshold)
-                else:
-                    needs_transform = abs(skewness) > skewness_threshold
+                needs_transform = abs(skewness) > skewness_threshold
 
-            normality_results[col] = {
-                'skewness': skewness,
-                'kurtosis': kurtosis,
-                'p_value': p_value,
-                'test_used': test_used,
-                'needs_transform': needs_transform
-            }
+        normality_results[col] = {
+            'skewness': skewness,
+            'kurtosis': kurtosis,
+            'p_value': p_value,
+            'test_used': test_used,
+            'needs_transform': needs_transform
+        }
 
-            # Conditional Detailed Logging
-            if debug:
-                self.logger.debug(f"Feature '{col}': p-value={p_value:.4f}, skewness={skewness:.4f}, needs_transform={needs_transform}")
-
-        self.normality_results = normality_results
-        self.preprocessing_steps.append(step_name)
-
-        # Completion Logging
+        # Conditional Detailed Logging
         if debug:
-            self.logger.debug(f"Completed: {step_name}. Normality results computed.")
-        else:
-            self.logger.info(f"Step '{step_name}' completed: Normality results computed.")
+            self.logger.debug(f"Feature '{col}': p-value={p_value:.4f}, skewness={skewness:.4f}, needs_transform={needs_transform}")
 
-        return normality_results
+    self.normality_results = normality_results
+    self.preprocessing_steps.append(step_name)
+
+    # Completion Logging
+    if debug:
+        self.logger.debug(f"Completed: {step_name}. Normality results computed.")
+    else:
+        self.logger.info(f"Step '{step_name}' completed: Normality results computed.")
+
+    return normality_results
 ```
 
 **Options:**
@@ -688,11 +567,11 @@ class DataPreprocessor:
   
     ```python
     from scipy.stats import anderson, kstest
-
+    
     # Anderson-Darling Test
     result = anderson(data)
     # Handle based on critical values
-
+    
     # Kolmogorov-Smirnov Test
     stat, p_val = kstest(data, 'norm')
     ```
@@ -706,7 +585,7 @@ class DataPreprocessor:
     ```python
     import matplotlib.pyplot as plt
     from scipy.stats import probplot
-
+    
     for col in features_to_transform:
         probplot(X[col], dist="norm", plot=plt)
         plt.title(f'QQ Plot of {col}')
@@ -718,7 +597,7 @@ class DataPreprocessor:
 
 ---
 
-### 5. Handle Outliers
+### **5. Handle Outliers**
 
 **Goal:**
 Reduce the influence of extreme values that can skew model performance.
@@ -743,112 +622,101 @@ Reduce the influence of extreme values that can skew model performance.
 from scipy import stats
 from scipy.stats.mstats import winsorize
 from sklearn.ensemble import IsolationForest
-import numpy as np
-import pandas as pd
-from typing import Tuple, Optional
 
-class DataPreprocessor:
-    # ... [Previous code]
+def handle_outliers(self, X_train: pd.DataFrame, y_train: Optional[pd.Series] = None, debug: bool = False) -> Tuple[pd.DataFrame, Optional[pd.Series]]:
+    """
+    Handle outliers based on the model's sensitivity and user options.
 
-    def handle_outliers(
-        self, 
-        X_train: pd.DataFrame, 
-        y_train: Optional[pd.Series] = None, 
-        debug: bool = False
-    ) -> Tuple[pd.DataFrame, Optional[pd.Series]]:
-        """
-        Handle outliers based on the model's sensitivity and user options.
+    Args:
+        X_train (pd.DataFrame): Training features.
+        y_train (Optional[pd.Series]): Training target.
+        debug (bool): Flag to control debug outputs.
 
-        Args:
-            X_train (pd.DataFrame): Training features.
-            y_train (Optional[pd.Series]): Training target.
-            debug (bool): Flag to control debug outputs.
+    Returns:
+        Tuple[pd.DataFrame, Optional[pd.Series]]: X_train without outliers and corresponding y_train.
+    """
+    step_name = "Handle Outliers"
+    self.logger.info(f"Step: {step_name}")
+    if debug:
+        self.logger.debug("Starting outlier handling.")
 
-        Returns:
-            Tuple[pd.DataFrame, Optional[pd.Series]]: X_train without outliers and corresponding y_train.
-        """
-        step_name = "Handle Outliers"
-        self.logger.info(f"Step: {step_name}")
-        if debug:
-            self.logger.debug("Starting outlier handling.")
+    initial_shape = X_train.shape[0]
+    new_columns = []
 
-        initial_shape = X_train.shape[0]
-        new_columns = []
+    # Fetch user-defined outlier handling options or set defaults
+    outlier_options = self.options.get('handle_outliers', {})
+    zscore_threshold = outlier_options.get('zscore_threshold', 3)
+    iqr_multiplier = outlier_options.get('iqr_multiplier', 1.5)
+    isolation_contamination = outlier_options.get('isolation_contamination', 0.05)
 
-        # Fetch user-defined outlier handling options or set defaults
-        outlier_options = self.options.get('handle_outliers', {})
-        zscore_threshold = outlier_options.get('zscore_threshold', 3)
-        iqr_multiplier = outlier_options.get('iqr_multiplier', 1.5)
-        isolation_contamination = outlier_options.get('isolation_contamination', 0.05)
+    # Check for target leakage: Ensure y_train is not used in transformations
+    if self.mode == 'train' and y_train is not None and debug:
+        self.logger.debug("y_train is present. Confirming it's not used in outlier handling.")
 
-        # Check for target leakage: Ensure y_train is not used in transformations
-        if self.mode == 'train' and y_train is not None and debug:
-            self.logger.debug("y_train is present. Confirming it's not used in outlier handling.")
-
-        for col in self.numericals:
-            if self.model_category in ['regression', 'classification']:
-                # Z-Score Filtering
-                apply_zscore = outlier_options.get('apply_zscore', True)
-                if apply_zscore:
-                    z_scores = np.abs((X_train[col] - X_train[col].mean()) / X_train[col].std())
-                    mask_z = z_scores < zscore_threshold
-                    removed_z = (~mask_z).sum()
-                    X_train = X_train[mask_z]
-                    if y_train is not None:
-                        y_train = y_train.loc[X_train.index]
-                    self.feature_reasons[col] += f'Outliers handled with Z-Score Filtering (threshold={zscore_threshold}) | '
-                    if debug:
-                        self.logger.debug(f"Removed {removed_z} outliers from '{col}' using Z-Score Filtering")
-
-                # IQR Filtering
-                apply_iqr = outlier_options.get('apply_iqr', True)
-                if apply_iqr:
-                    Q1 = X_train[col].quantile(0.25)
-                    Q3 = X_train[col].quantile(0.75)
-                    IQR = Q3 - Q1
-                    lower_bound = Q1 - iqr_multiplier * IQR
-                    upper_bound = Q3 + iqr_multiplier * IQR
-                    mask_iqr = (X_train[col] >= lower_bound) & (X_train[col] <= upper_bound)
-                    removed_iqr = (~mask_iqr).sum()
-                    X_train = X_train[mask_iqr]
-                    if y_train is not None:
-                        y_train = y_train.loc[X_train.index]
-                    self.feature_reasons[col] += f'Outliers handled with IQR Filtering (multiplier={iqr_multiplier}) | '
-                    if debug:
-                        self.logger.debug(f"Removed {removed_iqr} outliers from '{col}' using IQR Filtering")
-
-            elif self.model_category == 'clustering':
-                # IsolationForest
-                iso_forest = IsolationForest(contamination=isolation_contamination, random_state=42)
-                preds = iso_forest.fit_predict(X_train[[col]])
-                mask_iso = preds != -1
-                removed_iso = (preds == -1).sum()
-                X_train = X_train[mask_iso]
-                self.feature_reasons[col] += f'Outliers handled with IsolationForest (contamination={isolation_contamination}) | '
+    for col in self.numericals:
+        if self.model_category in ['regression', 'classification']:
+            # Z-Score Filtering
+            apply_zscore = outlier_options.get('apply_zscore', True)
+            if apply_zscore:
+                z_scores = np.abs((X_train[col] - X_train[col].mean()) / X_train[col].std())
+                mask_z = z_scores < zscore_threshold
+                removed_z = (~mask_z).sum()
+                X_train = X_train[mask_z]
+                if y_train is not None:
+                    y_train = y_train.loc[X_train.index]
+                self.feature_reasons[col] += f'Outliers handled with Z-Score Filtering (threshold={zscore_threshold}) | '
                 if debug:
-                    self.logger.debug(f"Removed {removed_iso} outliers from '{col}' using IsolationForest")
+                    self.logger.debug(f"Removed {removed_z} outliers from '{col}' using Z-Score Filtering")
 
-            elif self.model_category == 'tree_based_models':
-                # Typically no outlier handling
+            # IQR Filtering
+            apply_iqr = outlier_options.get('apply_iqr', True)
+            if apply_iqr:
+                Q1 = X_train[col].quantile(0.25)
+                Q3 = X_train[col].quantile(0.75)
+                IQR = Q3 - Q1
+                lower_bound = Q1 - iqr_multiplier * IQR
+                upper_bound = Q3 + iqr_multiplier * IQR
+                mask_iqr = (X_train[col] >= lower_bound) & (X_train[col] <= upper_bound)
+                removed_iqr = (~mask_iqr).sum()
+                X_train = X_train[mask_iqr]
+                if y_train is not None:
+                    y_train = y_train.loc[X_train.index]
+                self.feature_reasons[col] += f'Outliers handled with IQR Filtering (multiplier={iqr_multiplier}) | '
                 if debug:
-                    self.logger.debug(f"No outlier handling applied for tree-based model '{self.model_type}'.")
-                continue
+                    self.logger.debug(f"Removed {removed_iqr} outliers from '{col}' using IQR Filtering")
 
-            else:
-                if debug:
-                    self.logger.warning(f"Model category '{self.model_category}' not recognized for outlier handling.")
+        elif self.model_category == 'clustering':
+            # IsolationForest
+            iso_forest = IsolationForest(contamination=isolation_contamination, random_state=42)
+            preds = iso_forest.fit_predict(X_train[[col]])
+            mask_iso = preds != -1
+            removed_iso = (preds == -1).sum()
+            X_train = X_train[mask_iso]
+            self.feature_reasons[col] += f'Outliers handled with IsolationForest (contamination={isolation_contamination}) | '
+            if debug:
+                self.logger.debug(f"Removed {removed_iso} outliers from '{col}' using IsolationForest")
 
-        self.preprocessing_steps.append("Handle Outliers")
+        elif self.model_category == 'tree_based_models':
+            # Typically no outlier handling
+            if debug:
+                self.logger.debug(f"No outlier handling applied for tree-based model '{self.model_type}'.")
+            continue
 
-        # Completion Logging
-        if debug:
-            self.logger.debug(f"Completed: Handle Outliers. Initial samples: {initial_shape}, Final samples: {X_train.shape[0]}")
-            self.logger.debug(f"Missing values after outlier handling in X_train:\n{X_train.isnull().sum()}")
-            self.logger.debug(f"Outlier handling applied on columns: {new_columns}")
         else:
-            self.logger.info(f"Step '{step_name}' completed.")
+            if debug:
+                self.logger.warning(f"Model category '{self.model_category}' not recognized for outlier handling.")
 
-        return X_train, y_train
+    self.preprocessing_steps.append("Handle Outliers")
+
+    # Completion Logging
+    if debug:
+        self.logger.debug(f"Completed: Handle Outliers. Initial samples: {initial_shape}, Final samples: {X_train.shape[0]}")
+        self.logger.debug(f"Missing values after outlier handling in X_train:\n{X_train.isnull().sum()}")
+        self.logger.debug(f"Outlier handling applied on columns: {new_columns}")
+    else:
+        self.logger.info(f"Step '{step_name}' completed.")
+
+    return X_train, y_train
 ```
 
 **Options:**
@@ -861,17 +729,17 @@ class DataPreprocessor:
   
     ```python
     from sklearn.preprocessing import RobustScaler
-
+    
     scaler = RobustScaler()
     X_scaled = scaler.fit_transform(X[numerical_features])
     ```
-  
+
 - **Model-Based Outlier Handling:**
   - Utilize models that are inherently robust to outliers (e.g., tree-based models, ensemble methods).
 
 ---
 
-### 6. Choose and Apply Transformations (Based on Normality Tests)
+### **6. Choose and Apply Transformations (Based on Normality Tests)**
 
 **Goal:**
 Apply transformations to achieve distributions closer to model assumptions.
@@ -892,68 +760,57 @@ Apply transformations to achieve distributions closer to model assumptions.
 ```python
 from sklearn.preprocessing import PowerTransformer
 import numpy as np
-import pandas as pd
-from typing import List, Tuple, Optional
 
-class DataPreprocessor:
-    # ... [Previous code]
+def apply_transformations(self, X_train: pd.DataFrame, X_test: Optional[pd.DataFrame] = None, features_to_transform: List[str] = [], debug: bool = False) -> Tuple[pd.DataFrame, Optional[pd.DataFrame]]:
+    """
+    Apply transformations to numerical features based on normality test results.
 
-    def apply_transformations(
-        self, 
-        X_train: pd.DataFrame, 
-        X_test: Optional[pd.DataFrame] = None, 
-        features_to_transform: List[str] = [], 
-        debug: bool = False
-    ) -> Tuple[pd.DataFrame, Optional[pd.DataFrame]]:
-        """
-        Apply transformations to numerical features based on normality test results.
+    Args:
+        X_train (pd.DataFrame): Training features.
+        X_test (Optional[pd.DataFrame]): Testing features.
+        features_to_transform (List[str]): List of numerical features that need transformation.
+        debug (bool): Flag to control debug outputs.
 
-        Args:
-            X_train (pd.DataFrame): Training features.
-            X_test (Optional[pd.DataFrame]): Testing features.
-            features_to_transform (List[str]): List of numerical features that need transformation.
-            debug (bool): Flag to control debug outputs.
+    Returns:
+        Tuple[pd.DataFrame, Optional[pd.DataFrame]]: Transformed X_train and X_test.
+    """
+    step_name = "Choose and Apply Transformations"
+    self.logger.info(f"Step: {step_name}")
+    if debug:
+        self.logger.debug(f"Features to transform: {features_to_transform}")
 
-        Returns:
-            Tuple[pd.DataFrame, Optional[pd.DataFrame]]: Transformed X_train and X_test.
-        """
-        step_name = "Choose and Apply Transformations"
-        self.logger.info(f"Step: {step_name}")
-        if debug:
-            self.logger.debug(f"Features to transform: {features_to_transform}")
-
-        if not features_to_transform:
-            self.logger.info("No transformations required based on normality tests.")
-            self.preprocessing_steps.append(step_name)
-            return X_train, X_test
-
-        # Initialize PowerTransformer
-        pt = PowerTransformer(method='yeo-johnson')
-        pt.fit(X_train[features_to_transform])
-        X_train_transformed = X_train.copy()
-        X_train_transformed[features_to_transform] = pt.transform(X_train[features_to_transform])
-
-        if X_test is not None:
-            X_test_transformed = X_test.copy()
-            X_test_transformed[features_to_transform] = pt.transform(X_test[features_to_transform])
-        else:
-            X_test_transformed = None
-
-        # Store the transformer for inverse transformations and prediction data
-        self.transformers['power'] = pt
-
+    if not features_to_transform:
+        self.logger.info("No transformations required based on normality tests.")
         self.preprocessing_steps.append(step_name)
+        return X_train, X_test
 
-        # Completion Logging
-        if debug:
-            self.logger.debug(f"Completed: {step_name}. Transformed features: {features_to_transform}")
-            self.logger.debug(f"X_train transformed shape: {X_train_transformed.shape}")
-            if X_test_transformed is not None:
-                self.logger.debug(f"X_test transformed shape: {X_test_transformed.shape}")
-        else:
-            self.logger.info(f"Step '{step_name}' completed: Applied transformations to specified features.")
+    # Initialize PowerTransformer
+    pt = PowerTransformer(method='yeo-johnson')
+    pt.fit(X_train[features_to_transform])
+    X_train_transformed = X_train.copy()
+    X_train_transformed[features_to_transform] = pt.transform(X_train[features_to_transform])
 
-        return X_train_transformed, X_test_transformed
+    if X_test is not None:
+        X_test_transformed = X_test.copy()
+        X_test_transformed[features_to_transform] = pt.transform(X_test[features_to_transform])
+    else:
+        X_test_transformed = None
+
+    # Store the transformer for inverse transformations and prediction data
+    self.transformers['power'] = pt
+
+    self.preprocessing_steps.append(step_name)
+
+    # Completion Logging
+    if debug:
+        self.logger.debug(f"Completed: {step_name}. Transformed features: {features_to_transform}")
+        self.logger.debug(f"X_train transformed shape: {X_train_transformed.shape}")
+        if X_test_transformed is not None:
+            self.logger.debug(f"X_test transformed shape: {X_test_transformed.shape}")
+    else:
+        self.logger.info(f"Step '{step_name}' completed: Applied transformations to specified features.")
+
+    return X_train_transformed, X_test_transformed
 ```
 
 **Options:**
@@ -967,23 +824,23 @@ class DataPreprocessor:
     ```python
     from sklearn.pipeline import Pipeline
     from sklearn.compose import ColumnTransformer
-
+    
     transformer = ColumnTransformer([
         ('power', PowerTransformer(), features_to_transform),
         # Add other transformers if needed
     ])
-
+    
     transformer.fit(X_train)
     X_train_transformed = transformer.transform(X_train)
     X_test_transformed = transformer.transform(X_test)
     ```
-  
+
 - **Custom Transformations:**
   - Apply domain-specific transformations as required by the dataset or model.
   
     ```python
     import numpy as np
-
+    
     # Example: Log Transformation
     X_train[features_to_transform] = np.log1p(X_train[features_to_transform])
     X_test[features_to_transform] = np.log1p(X_test[features_to_transform])
@@ -1000,13 +857,13 @@ class DataPreprocessor:
         X_new_imputed[features_to_transform]
     )
     ```
-  
+
 - **Handling Infeasible Transformations:**
   - If certain transformations are not feasible for new data (e.g., log transform on non-positive values), decide on a strategy to handle them (e.g., clipping or using alternative transformations).
 
 ---
 
-### 7. Encode Categorical Variables
+### **7. Encode Categorical Variables**
 
 **Goal:**
 Convert categorical data into numeric form, ensuring that categorical relationships and structures are preserved while making the data suitable for the chosen model.
@@ -1117,7 +974,7 @@ When using SMOTE variants that handle categorical features (e.g., `SMOTENC`), no
     # Update encoded_categorical_features
     encoded_categorical_features = onehot_feature_names.tolist() + ordinal_features
     ```
-  
+
 - **Target Encoding for High Cardinality Nominal Features:**
   - For high cardinality nominal features, use target encoding techniques that may leverage y.
   
@@ -1182,7 +1039,7 @@ self.encoders['ordinal_ord'] = ordinal_encoder_ord
         X_new_imputed[ordinal_features]
     )
     ```
-  
+
 - **Handle Unseen Categories:**
   - Ensure encoders are set to handle unknown categories gracefully to prevent errors during transformation.
   
@@ -1192,7 +1049,7 @@ self.encoders['ordinal_ord'] = ordinal_encoder_ord
 
 ---
 
-### 8. Apply Scaling (If Needed by Model)
+### **8. Apply Scaling (If Needed by Model)**
 
 **Goal:**
 Normalize feature scales so that features contribute appropriately, especially in distance or gradient-based models.
@@ -1212,84 +1069,74 @@ Normalize feature scales so that features contribute appropriately, especially i
 
 ```python
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler
-import pandas as pd
-from typing import Tuple, Optional
 
-class DataPreprocessor:
-    # ... [Previous code]
+def apply_scaling(self, X_train: pd.DataFrame, X_test: Optional[pd.DataFrame] = None, debug: bool = False) -> Tuple[pd.DataFrame, Optional[pd.DataFrame]]:
+    """
+    Apply scaling to numerical features based on model requirements.
 
-    def apply_scaling(
-        self, 
-        X_train: pd.DataFrame, 
-        X_test: Optional[pd.DataFrame] = None, 
-        debug: bool = False
-    ) -> Tuple[pd.DataFrame, Optional[pd.DataFrame]]:
-        """
-        Apply scaling to numerical features based on model requirements.
+    Args:
+        X_train (pd.DataFrame): Training features.
+        X_test (Optional[pd.DataFrame]): Testing features.
+        debug (bool): Flag to control debug outputs.
 
-        Args:
-            X_train (pd.DataFrame): Training features.
-            X_test (Optional[pd.DataFrame]): Testing features.
-            debug (bool): Flag to control debug outputs.
+    Returns:
+        Tuple[pd.DataFrame, Optional[pd.DataFrame]]: Scaled X_train and X_test.
+    """
+    step_name = "Apply Scaling"
+    self.logger.info(f"Step: {step_name}")
+    numerical_features = self.numericals  # Assuming self.numericals contains numerical feature names
 
-        Returns:
-            Tuple[pd.DataFrame, Optional[pd.DataFrame]]: Scaled X_train and X_test.
-        """
-        step_name = "Apply Scaling"
-        self.logger.info(f"Step: {step_name}")
-        numerical_features = self.numericals  # Assuming self.numericals contains numerical feature names
+    # Determine scaling strategy based on model type
+    scaling_strategy = None
+    if self.model_category in ['regression', 'classification']:
+        if self.model_type in ['linear_regression', 'logistic_regression']:
+            scaling_strategy = 'StandardScaler'
+        elif self.model_type in ['neural_networks', 'svm', 'k_nn', 'clustering']:
+            scaling_strategy = 'MinMaxScaler'
+    elif self.model_category == 'tree_based_models':
+        scaling_strategy = None  # No scaling needed
+    else:
+        scaling_strategy = None  # Default to no scaling
 
-        # Determine scaling strategy based on model type
-        scaling_strategy = None
-        if self.model_category in ['regression', 'classification']:
-            if self.model_type.lower() in ['linear regression', 'logistic regression']:
-                scaling_strategy = 'StandardScaler'
-            elif self.model_type.lower() in ['neural networks', 'svm', 'k_nn', 'clustering']:
-                scaling_strategy = 'MinMaxScaler'
-        elif self.model_category == 'tree_based_models':
-            scaling_strategy = None  # No scaling needed
+    if scaling_strategy == 'StandardScaler':
+        scaler = StandardScaler()
+    elif scaling_strategy == 'MinMaxScaler':
+        scaler = MinMaxScaler()
+    elif scaling_strategy == 'RobustScaler':
+        scaler = RobustScaler()
+    else:
+        scaler = None
+
+    if scaler:
+        scaler.fit(X_train[numerical_features])
+        X_train_scaled = X_train.copy()
+        X_train_scaled[numerical_features] = scaler.transform(X_train[numerical_features])
+
+        if X_test is not None:
+            X_test_scaled = X_test.copy()
+            X_test_scaled[numerical_features] = scaler.transform(X_test[numerical_features])
         else:
-            scaling_strategy = None  # Default to no scaling
+            X_test_scaled = None
 
-        if scaling_strategy == 'StandardScaler':
-            scaler = StandardScaler()
-        elif scaling_strategy == 'MinMaxScaler':
-            scaler = MinMaxScaler()
-        elif scaling_strategy == 'RobustScaler':
-            scaler = RobustScaler()
+        # Store scaler for inverse transformations and prediction data
+        self.scalers['scaler'] = scaler
+
+        self.preprocessing_steps.append(step_name)
+
+        # Completion Logging
+        if debug:
+            self.logger.debug(f"Completed: {step_name}. Applied {scaling_strategy} to numerical features.")
+            self.logger.debug(f"X_train_scaled shape: {X_train_scaled.shape}")
+            if X_test_scaled is not None:
+                self.logger.debug(f"X_test_scaled shape: {X_test_scaled.shape}")
         else:
-            scaler = None
+            self.logger.info(f"Step '{step_name}' completed: Applied {scaling_strategy} to numerical features.")
 
-        if scaler:
-            scaler.fit(X_train[numerical_features])
-            X_train_scaled = X_train.copy()
-            X_train_scaled[numerical_features] = scaler.transform(X_train[numerical_features])
-
-            if X_test is not None:
-                X_test_scaled = X_test.copy()
-                X_test_scaled[numerical_features] = scaler.transform(X_test[numerical_features])
-            else:
-                X_test_scaled = None
-
-            # Store scaler for inverse transformations and prediction data
-            self.scalers['scaler'] = scaler
-
-            self.preprocessing_steps.append(step_name)
-
-            # Completion Logging
-            if debug:
-                self.logger.debug(f"Completed: {step_name}. Applied {scaling_strategy} to numerical features.")
-                self.logger.debug(f"X_train_scaled shape: {X_train_scaled.shape}")
-                if X_test_scaled is not None:
-                    self.logger.debug(f"X_test_scaled shape: {X_test_scaled.shape}")
-            else:
-                self.logger.info(f"Step '{step_name}' completed: Applied {scaling_strategy} to numerical features.")
-
-            return X_train_scaled, X_test_scaled
-        else:
-            self.logger.info("No scaling applied based on model type.")
-            self.preprocessing_steps.append(step_name)
-            return X_train, X_test
+        return X_train_scaled, X_test_scaled
+    else:
+        self.logger.info("No scaling applied based on model type.")
+        self.preprocessing_steps.append(step_name)
+        return X_train, X_test
 ```
 
 **Options:**
@@ -1299,17 +1146,17 @@ class DataPreprocessor:
   
     ```python
     from sklearn.preprocessing import RobustScaler
-
+    
     scaler = RobustScaler()
     X_scaled = scaler.fit_transform(X[numerical_features])
     ```
-  
+
 - **Model-Specific Scaling:**
   - For SVM/k-NN, experiment with `StandardScaler` instead of `MinMaxScaler` to see if performance improves.
-  
+
 - **No Scaling for Tree-Based Models:**
   - Set `scaler = None` and skip scaling steps.
-  
+
     ```python
     scaler = None
     ```
@@ -1347,13 +1194,13 @@ else:
     # Reconstruct DataFrame
     X_new_final[numerical_features] = X_new_scaled
     ```
-  
+
 - **Handling New Features:**
   - Ensure that new data contains the same numerical features as the training data.
 
 ---
 
-### 9. Implement SMOTE (Train Only)
+### **9. Implement SMOTE (Train Only)**
 
 **Goal:**
 Address class imbalance in classification tasks by generating synthetic minority class samples.
@@ -1426,20 +1273,20 @@ To integrate `SMOTENC` with ordinal encoding for nominal categorical features, f
     ```python
     smote = SMOTE(sampling_strategy=0.5, random_state=self.random_state)  # Minority class will be 50% the size of the majority class
     ```
-  
+
 - **Modify `k_neighbors`:**
   - Control the neighborhood size for synthetic sample generation.
   
     ```python
     smote = SMOTE(k_neighbors=3, random_state=self.random_state)
     ```
-  
+
 - **Choose a Different SMOTE Variant:**
   - Select a variant that best fits the data characteristics.
   
     ```python
     from imblearn.over_sampling import BorderlineSMOTE
-
+    
     smote = BorderlineSMOTE(sampling_strategy='auto', random_state=self.random_state)
     ```
 
@@ -1447,7 +1294,7 @@ To integrate `SMOTENC` with ordinal encoding for nominal categorical features, f
 
 - **Ordinal Encoding of Nominal Features:**
   - Imposes an arbitrary order. Ensure that your model can handle this without misinterpretation. Tree-based models are generally robust to such encodings, but other models might interpret the encoded values as having inherent order.
-  
+
 - **Inverse Transformation:**
   - Keep track of the encoders used within `SMOTENC` for later inverse transformations if needed.
 
@@ -1488,7 +1335,7 @@ self.smote = smote
 
 ---
 
-### 10. Train Model on Preprocessed Training Data
+### **10. Train Model on Preprocessed Training Data**
 
 **Goal:**
 Fit the chosen model to the fully preprocessed, balanced training data.
@@ -1518,7 +1365,7 @@ Fit the chosen model to the fully preprocessed, balanced training data.
     # Lasso Regression
     model = Lasso(alpha=0.1, random_state=42)
     ```
-  
+
 - **Model Selection:**
   - Experiment with different classifiers (e.g., `RandomForestClassifier` instead of `LogisticRegression`).
   
@@ -1527,7 +1374,7 @@ Fit the chosen model to the fully preprocessed, balanced training data.
 
     model = RandomForestClassifier(n_estimators=100, random_state=42)
     ```
-  
+
 - **Hyperparameter Tuning:**
   - Utilize grid search or randomized search to find optimal hyperparameters.
   
@@ -1561,13 +1408,13 @@ model.fit(X_train_res, y_train_res)
 
 - **Model Selection:**
   - Choose models based on the problem type, data characteristics, and performance metrics.
-  
+
 - **Regularization:**
   - Helps in preventing overfitting, especially for models like Logistic Regression.
 
 ---
 
-### 11. Predict on Test Data (No SMOTE on Test)
+### **11. Predict on Test Data (No SMOTE on Test)**
 
 **Goal:**
 Evaluate model performance on the original, untouched test set, ensuring a real-world performance estimate.
@@ -1584,7 +1431,7 @@ Evaluate model performance on the original, untouched test set, ensuring a real-
 
 - **Avoid Synthetic Augmentation:**
   - Applying SMOTE-like methods on the test set is not recommended as it distorts the true distribution.
-  
+
 - **Separate Evaluation Scenarios:**
   - If needed, create a separate evaluation scenario with SMOTE-like methods, but primarily, keep the test set untouched.
 
@@ -1619,13 +1466,12 @@ print("F1 Score:", f1_score(y_test, y_pred, average='weighted'))
     print("Precision:", precision_score(y_test, y_pred, average='weighted'))
     print("Recall:", recall_score(y_test, y_pred, average='weighted'))
     ```
-  
+
 - **Confusion Matrix:**
   - To visualize true vs. predicted classes.
   
     ```python
     from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
-    import matplotlib.pyplot as plt
 
     cm = confusion_matrix(y_test, y_pred)
     disp = ConfusionMatrixDisplay(confusion_matrix=cm)
@@ -1635,7 +1481,7 @@ print("F1 Score:", f1_score(y_test, y_pred, average='weighted'))
 
 ---
 
-### 12. Final Inverse Transformations for Interpretability
+### **12. Final Inverse Transformations for Interpretability**
 
 **Goal:**
 Revert preprocessed data (scaled, encoded, transformed) back to its original form for interpretability and reporting.
@@ -1647,11 +1493,11 @@ Revert preprocessed data (scaled, encoded, transformed) back to its original for
 
 - **Inverse Scaling:**
   - Using the scaler’s `inverse_transform` if scaling was applied.
-  
+
 - **Inverse Encoding:**
   - **Ordinal:** Use `OrdinalEncoder`’s `inverse_transform`.
   - **One-Hot:** Use `OneHotEncoder`’s `inverse_transform` to reconstruct original categories.
-  
+
 - **Inverse Transformations for Log or Power Transforms:**
   - Apply the inverse (e.g., exponential for log, inverse transform for `PowerTransformer`).
 
@@ -1659,7 +1505,7 @@ Revert preprocessed data (scaled, encoded, transformed) back to its original for
 
 - **Multiple Transformations:**
   - If multiple transformations were tested, track and apply the correct inverse.
-  
+
 - **Embeddings (NN-specific):**
   - Retain mapping for interpretability or skip if direct inverse is not feasible.
 
@@ -1701,7 +1547,7 @@ if 'power' in self.transformers and features_to_transform:
 
 - **Track Transformers:**
   - Ensure that all transformers (`scalers`, `encoders`, `power transformers`) used during preprocessing are saved and accessible for inverse transformations.
-  
+
 - **Consistent Order:**
   - Apply inverse transformations in the reverse order of the preprocessing steps to maintain data integrity.
 
@@ -1712,7 +1558,7 @@ if 'power' in self.transformers and features_to_transform:
 
 ---
 
-### 13. Final Inverse Transformation Validation
+### **13. Final Inverse Transformation Validation**
 
 **Goal:**
 Validate that the inverse transformations restore the data to its near-original form, ensuring interpretability is accurate.
@@ -1724,7 +1570,7 @@ Validate that the inverse transformations restore the data to its near-original 
 
 - **Numerical Features:**
   - Compute Mean Absolute Error (MAE) or similar metric between original and inverse-transformed values.
-  
+
 - **Categorical Features:**
   - Verify exact matches between original and inverse-transformed categories.
 
@@ -1732,36 +1578,9 @@ Validate that the inverse transformations restore the data to its near-original 
 
 - **Adjust Tolerance:**
   - Modify tolerance for numerical differences based on precision requirements.
-  
+
 - **Perform Visual Checks:**
   - Plot distributions of original vs. inverse-transformed features.
-  
-    ```python
-    import matplotlib.pyplot as plt
-    import seaborn as sns
-    from scipy.stats import probplot
-
-    # Numerical Features
-    for col in numerical_features:
-        plt.figure(figsize=(10, 4))
-        sns.kdeplot(X_test[col], label='Original', shade=True)
-        sns.kdeplot(X_test_original_scale[col], label='Inverse Transformed', shade=True)
-        plt.title(f'Distribution Comparison for {col}')
-        plt.legend()
-        plt.show()
-    ```
-  
-- **Statistical Tests:**
-  - Perform statistical tests to assess the similarity between original and transformed data distributions.
-  
-    ```python
-    from scipy.stats import ttest_ind
-
-    # For numerical features
-    for col in numerical_features:
-        stat, p_val = ttest_ind(X_test[col].dropna(), X_test_original_scale[col].dropna())
-        print(f"T-Test for {col}: stat={stat}, p-value={p_val}")
-    ```
 
 **Implementation Example:**
 
@@ -1808,7 +1627,7 @@ else:
         plt.legend()
         plt.show()
     ```
-  
+
 - **Statistical Tests:**
   - Perform statistical tests to assess the similarity between original and transformed data distributions.
   
@@ -1828,11 +1647,11 @@ else:
 
 ---
 
-## Automated Output Datasets
+## **Automated Output Datasets**
 
 To facilitate automation and ensure consistency across different modes (`train`, `predict`, `clustering`), the pipeline outputs specific datasets tailored to each scenario. Below is a summary of the output datasets per mode:
 
-### Training Mode
+### **Training Mode:**
 
 - **Outputs:**
   - `X_train_preprocessed`: Preprocessed and scaled training features.
@@ -1843,14 +1662,14 @@ To facilitate automation and ensure consistency across different modes (`train`,
   - `X_train_inversed`: Inverse-transformed training features for interpretability (optional).
   - `X_test_inversed`: Inverse-transformed testing features for interpretability (optional).
 
-### Prediction Mode
+### **Prediction Mode:**
 
 - **Outputs:**
   - `X_new_preprocessed`: Preprocessed and scaled new/unseen features ready for prediction.
   - `recommendations`: Preprocessing recommendations based on new data analysis.
   - `X_new_inversed`: Inverse-transformed new features for interpretability (optional).
 
-### Clustering Mode
+### **Clustering Mode:**
 
 - **Outputs:**
   - `X_preprocessed`: Preprocessed and scaled features tailored for clustering algorithms.
@@ -1861,7 +1680,60 @@ To facilitate automation and ensure consistency across different modes (`train`,
 
 ---
 
-## SMOTE Calculations for Numericals
+## **Final Verification and Readiness for K-Means Clustering**
+
+Based on the comprehensive adjustments above, here's a summary to confirm that your data is correctly preprocessed and ready for K-Means Clustering:
+
+1. **Dataset Loading:**
+   - Successfully loaded without issues.
+
+2. **Feature Selection:**
+   - Relevant features are selected and filtered correctly.
+
+3. **Missing Values:**
+   - All missing values have been imputed appropriately.
+
+4. **Outlier Handling:**
+   - Outliers have been effectively removed or handled, resulting in a cleaner dataset.
+
+5. **Transformations:**
+   - Numerical features are normalized using appropriate transformations, ensuring that K-Means isn't skewed by feature scales.
+
+6. **Categorical Encoding:**
+   - Categorical variables have been encoded numerically, converting them into formats suitable for K-Means clustering.
+
+7. **Scaling:**
+   - Numerical features have been scaled using `MinMaxScaler`, standardizing feature ranges, which is crucial for distance-based algorithms like K-Means.
+
+8. **SMOTE Implementation:**
+   - **Not Applied for K-Means**, as SMOTE is a supervised technique for handling class imbalance, which is irrelevant in unsupervised clustering.
+
+9. **Model Training:**
+   - K-Means has been trained on the fully preprocessed and appropriately scaled data.
+
+10. **Prediction and Evaluation:**
+    - Clustering results have been evaluated without applying SMOTE, ensuring that the true data distribution is maintained.
+
+11. **Inverse Transformations:**
+    - Successfully applied and validated, ensuring that preprocessing steps are reversible and accurate.
+
+12. **Data Integrity:**
+    - The final dataset is clean, scaled, and encoded, making it suitable for effective K-Means clustering.
+
+**Final Dataset Characteristics for K-Means:**
+
+- **Shape:** `(106, 15)` indicating 106 observations with 15 features.
+- **Feature Types:** All features are numerical, suitable for K-Means.
+- **Data Quality:** No missing values or outliers; features are scaled and encoded appropriately.
+- **Integrity:** Inverse transformations validate the accuracy of preprocessing steps.
+
+**Conclusion:**
+
+Your data preprocessing pipeline has successfully prepared the dataset for K-Means Clustering. The data is clean, scaled, and encoded, ensuring that the clustering algorithm can effectively identify patterns and groupings within the data.
+
+---
+
+## **SMOTE Calculations for Numericals**
 
 Incorporating SMOTE recommendations based on class distribution and data characteristics ensures that you choose the most appropriate oversampling technique. Below is a detailed approach to calculate and recommend SMOTE variants:
 
@@ -1964,7 +1836,7 @@ Based on the calculations, the pipeline recommends appropriate SMOTE variants to
 
 ---
 
-## Final Verification and Readiness for K-Means Clustering
+## **Final Verification and Readiness for K-Means Clustering**
 
 After completing all preprocessing steps, ensure the dataset is ready for K-Means Clustering by verifying the following:
 
@@ -2010,140 +1882,4 @@ After completing all preprocessing steps, ensure the dataset is ready for K-Mean
 - **Feature Types:** All features are numerical, suitable for K-Means.
 - **Data Quality:** No missing values or outliers; features are scaled and encoded appropriately.
 - **Integrity:** Inverse transformations validate the accuracy of preprocessing steps.
-
-**Conclusion:**
-
-Your data preprocessing pipeline has successfully prepared the dataset for K-Means Clustering. The data is clean, scaled, and encoded, ensuring that the clustering algorithm can effectively identify patterns and groupings within the data.
-
----
-
-# **Usage Example**
-
-Here's a brief example of how to utilize the `DataPreprocessor` class within your workflow:
-
-```python
-import pandas as pd
-
-# Define column assets
-column_assets = {
-    'numericals': ['age', 'income', 'balance'],
-    'ordinal_categoricals': ['education_level'],
-    'nominal_categoricals': ['gender', 'marital_status'],
-    'y_variable': ['target']
-}
-
-# Initialize DataPreprocessor
-preprocessor = DataPreprocessor(
-    model_type='Logistic Regression',
-    column_assets=column_assets,
-    mode='train',
-    options={
-        'handle_missing_values': {
-            'numerical_strategy': {'strategy': 'mean', 'imputer': 'SimpleImputer'},
-            'categorical_strategy': {'strategy': 'most_frequent', 'imputer': 'SimpleImputer'}
-        },
-        'split_dataset': {
-            'test_size': 0.2,
-            'random_state': 42,
-            'stratify_for_classification': True
-        },
-        'handle_outliers': {
-            'zscore_threshold': 3,
-            'iqr_multiplier': 1.5,
-            'apply_zscore': True,
-            'apply_iqr': True
-        },
-        'test_normality': {
-            'p_value_threshold': 0.05,
-            'skewness_threshold': 1.0,
-            'use_p_value_other_models': False
-        },
-        'smote_recommendation': {
-            'imbalance_threshold': 0.1,
-            'noise_threshold': 0.1,
-            'overlap_threshold': 0.1,
-            'boundary_threshold': 0.1,
-            'extreme_imbalance_threshold': 0.05
-        }
-    },
-    debug=True
-)
-
-# Load data
-data = pd.read_csv('data.csv')
-X = data.drop('target', axis=1)
-y = data['target']
-
-# Step 1: Handle Missing Values
-X_train, X_test = preprocessor.handle_missing_values(X, y, debug=True)
-
-# Step 2: Split Dataset
-X_train, X_test, y_train, y_test = preprocessor.split_dataset(X_train, y, debug=True)
-
-# Step 3: Handle Outliers
-X_train, y_train = preprocessor.handle_outliers(X_train, y_train, debug=True)
-
-# Step 4: Test for Normality
-normality_results = preprocessor.test_normality(X_train, debug=True)
-
-# Step 5: Apply Transformations
-features_to_transform = [col for col, res in normality_results.items() if res['needs_transform']]
-X_train, X_test = preprocessor.apply_transformations(X_train, X_test, features_to_transform, debug=True)
-
-# Step 6: Encode Categorical Variables
-X_train, X_test = preprocessor.encode_categorical_variables(X_train, X_test, debug=True)
-
-# Step 7: Apply Scaling
-X_train, X_test = preprocessor.apply_scaling(X_train, X_test, debug=True)
-
-# Step 8: Implement SMOTE
-X_train_res, y_train_res = preprocessor.implement_smote(X_train, y_train, debug=True)
-
-# Step 9: Train Model
-preprocessor.train_model(X_train_res, y_train_res, debug=True)
-
-# Step 10: Predict on Test Data
-preprocessor.predict_and_evaluate(X_test, y_test, debug=True)
-
-# Step 11: Inverse Transformations (Optional)
-X_test_original = preprocessor.inverse_transform(X_test, debug=True)
-
-# Step 12: Validate Inverse Transformations
-preprocessor.validate_inverse_transformations(X_test, X_test_original, debug=True)
-```
-
----
-
-## **Contribution Guidelines**
-
-We welcome contributions to enhance the `DataPreprocessor` pipeline. Please follow these steps to contribute:
-
-1. **Fork the Repository**
-2. **Create a Feature Branch**
-    ```bash
-    git checkout -b feature/your-feature-name
-    ```
-3. **Commit Your Changes**
-    ```bash
-    git commit -m "Add your message"
-    ```
-4. **Push to the Branch**
-    ```bash
-    git push origin feature/your-feature-name
-    ```
-5. **Open a Pull Request**
-
-Please ensure your code adheres to the existing coding standards and includes necessary tests.
-
----
-
-## **License**
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
----
-
-## **Contact**
-
-For any inquiries or support, please open an issue on the repository or contact [your-email@example.com](mailto:ghadfiield32@gmail.com).
 

@@ -1,0 +1,101 @@
+education_level,job_satisfaction,gender,city,age,salary,working_hours,result
+High School,Medium,Male,Los Angeles,33.0,51949.0,45.0,0
+Masters,Low,Male,Chicago,38.0,100080.0,58.0,0
+Masters,High,Female,Los Angeles,28.0,67744.0,46.0,0
+Bachelors,Medium,Male,Chicago,54.0,75543.0,55.0,0
+PhD,Medium,Male,Los Angeles,53.0,66187.0,33.0,0
+Bachelors,High,Male,Los Angeles,52.0,37239.0,30.0,0
+PhD,Medium,Male,Los Angeles,36.0,44489.0,37.0,0
+Masters,High,Female,Chicago,37.0,88017.0,46.0,0
+Bachelors,Low,Male,Los Angeles,35.0,91877.0,32.0,0
+High School,Medium,Female,Houston,64.0,73125.0,58.0,0
+Bachelors,Medium,Male,New York,58.0,79922.0,49.0,0
+Bachelors,Low,Female,Los Angeles,31.0,62049.0,44.0,0
+Bachelors,Low,Male,Houston,32.0,67131.0,44.0,0
+Bachelors,High,Male,Chicago,48.0,72944.0,53.0,0
+High School,Medium,Other,Los Angeles,18.0,103963.0,51.0,1
+Bachelors,Low,Female,Chicago,20.0,54285.0,43.0,0
+Bachelors,High,Female,Chicago,33.0,67626.0,55.0,0
+PhD,High,Male,Chicago,40.0,72808.0,57.0,0
+Masters,Medium,Male,New York,28.0,118464.0,52.0,0
+Masters,High,Male,Los Angeles,29.0,83871.0,43.0,0
+High School,Low,Female,Chicago,27.0,49198.0,53.0,0
+High School,Low,Male,Houston,49.0,49758.0,31.0,0
+High School,High,Female,Chicago,33.0,45254.0,42.0,0
+Masters,High,Male,New York,25.0,74238.0,55.0,0
+High School,High,Other,Chicago,55.0,31252.0,43.0,0
+Bachelors,Medium,Female,Chicago,29.0,69764.0,56.0,0
+High School,High,Female,New York,41.0,107709.0,53.0,0
+Masters,High,Male,Los Angeles,45.0,67441.0,48.0,1
+Bachelors,High,Male,Chicago,25.0,83682.0,36.0,0
+Bachelors,High,Female,Los Angeles,45.0,89494.0,32.0,0
+Bachelors,Medium,Male,Los Angeles,-14.0,-20258.0,11.0,0
+High School,Medium,Male,Los Angeles,43.0,95215.0,52.0,0
+Bachelors,Medium,Other,New York,25.0,108587.0,43.0,0
+Bachelors,High,Female,New York,45.0,36949.0,40.0,0
+High School,High,Male,Houston,45.0,85393.0,44.0,1
+PhD,Low,Male,Houston,54.0,103553.0,57.0,0
+Bachelors,Medium,Male,Los Angeles,58.0,36941.0,42.0,0
+Bachelors,Medium,Female,Houston,53.0,55934.0,47.0,0
+Masters,Medium,Male,Chicago,44.0,53386.0,55.0,0
+Bachelors,High,Male,Los Angeles,34.0,91886.0,35.0,0
+High School,Low,Male,Los Angeles,26.0,105745.0,32.0,0
+High School,Low,Male,New York,50.0,113251.0,48.0,0
+Bachelors,Medium,Female,New York,37.0,83413.0,44.0,0
+High School,Low,Male,Chicago,30.0,86800.0,54.0,1
+,,,,,,,0
+,,,,,,,0
+Bachelors,High,Male,Houston,30.0,100390.0,57.0,0
+High School,Medium,Male,Houston,63.0,82329.0,39.0,0
+Bachelors,Medium,Male,New York,52.0,73088.0,36.0,0
+PhD,Medium,Other,Houston,23.0,69811.0,54.0,0
+High School,Medium,Female,Houston,35.0,85479.0,46.0,0
+Bachelors,Low,Female,Houston,22.0,115392.0,36.0,0
+High School,Medium,Female,New York,64.0,117369.0,51.0,0
+,,,,,,,0
+Bachelors,Medium,Female,Chicago,19.0,85123.0,59.0,0
+High School,High,Male,Chicago,27.0,103477.0,41.0,0
+Bachelors,Medium,Female,Houston,47.0,44388.0,54.0,0
+Bachelors,Medium,Male,Chicago,62.0,35569.0,46.0,0
+Bachelors,Medium,Male,Houston,22.0,99836.0,42.0,0
+High School,Medium,Male,Houston,50.0,66586.0,49.0,0
+High School,High,Male,Houston,18.0,42015.0,54.0,0
+High School,Low,Male,Los Angeles,35.0,75002.0,33.0,1
+High School,Medium,Male,New York,49.0,36254.0,39.0,0
+Bachelors,Medium,Other,Los Angeles,64.0,47144.0,32.0,0
+Bachelors,High,Male,Houston,101.0,169433.0,79.0,0
+High School,Low,Male,New York,-17.0,-28117.0,8.0,0
+High School,High,Female,Chicago,43.0,101774.0,47.0,0
+High School,Medium,Female,New York,42.0,36090.0,44.0,0
+Bachelors,Low,Male,Chicago,39.0,41637.0,33.0,0
+Masters,High,Female,Houston,44.0,52415.0,44.0,1
+,,,,,,,0
+PhD,High,Male,New York,50.0,88243.0,31.0,0
+High School,Medium,Other,Houston,51.0,71240.0,44.0,0
+PhD,Medium,Female,Chicago,58.0,113807.0,37.0,0
+Bachelors,Medium,Male,Los Angeles,52.0,63434.0,37.0,1
+High School,High,Male,Chicago,18.0,99724.0,46.0,0
+Bachelors,Low,Other,Los Angeles,38.0,105697.0,41.0,0
+Bachelors,Medium,Female,Los Angeles,23.0,58732.0,48.0,0
+Bachelors,Low,Female,Chicago,45.0,41314.0,39.0,1
+Bachelors,Low,Female,New York,34.0,53954.0,38.0,0
+Bachelors,Medium,Female,Los Angeles,22.0,87108.0,34.0,0
+Bachelors,Medium,Other,Los Angeles,48.0,117044.0,35.0,0
+Bachelors,Medium,Other,Los Angeles,22.0,117505.0,49.0,0
+,,,,,,,0
+Bachelors,High,Female,Chicago,20.0,53061.0,31.0,0
+High School,Low,Female,Chicago,40.0,109252.0,56.0,0
+Masters,Low,Female,Houston,54.0,69749.0,53.0,0
+Bachelors,Medium,Female,Houston,54.0,46907.0,56.0,0
+PhD,Medium,Male,Chicago,27.0,48777.0,42.0,0
+Bachelors,Low,Female,Chicago,27.0,81745.0,35.0,0
+Masters,Low,Female,New York,36.0,111818.0,34.0,1
+Masters,Medium,Female,Los Angeles,34.0,53624.0,54.0,0
+High School,High,Female,Los Angeles,38.0,53321.0,30.0,0
+Bachelors,Low,Female,New York,31.0,40488.0,50.0,0
+Bachelors,High,Male,Chicago,26.0,52574.0,51.0,0
+Masters,Medium,Male,Los Angeles,63.0,35240.0,50.0,0
+Bachelors,Low,Male,Houston,18.0,73221.0,35.0,0
+High School,Medium,Male,Houston,62.0,40478.0,35.0,0
+Masters,Low,Male,Chicago,30.0,85645.0,52.0,1
+Masters,Medium,Female,Los Angeles,21.0,49262.0,45.0,0

@@ -1,6 +1,3 @@
-# ml_preprocessor
-Automated preprocessing and inverse preprocessing utilities for machine learning models.
-
 # **Comprehensive Guide to Enhanced Data Preprocessing Pipeline**
 
 ## Table of Contents
@@ -2145,5 +2142,5 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## **Contact**
 
-For any inquiries or support, please open an issue on the repository or contact [your-email@example.com](mailto:ghadfiield32@gmail.com).
+For any inquiries or support, please open an issue on the repository or contact [your-email@example.com](mailto:your-email@example.com).
 

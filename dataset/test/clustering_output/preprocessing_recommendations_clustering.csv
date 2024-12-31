@@ -1,0 +1,16 @@
+Preprocessing Reason
+Categorical: Most_frequent Imputation
+Numerical: Mean Imputation | Outliers handled with IsolationForest (contamination=0.05)
+Numerical: Mean Imputation | Outliers handled with IsolationForest (contamination=0.05)
+Numerical: Mean Imputation | Outliers handled with IsolationForest (contamination=0.05)
+Numerical: Mean Imputation | Outliers handled with IsolationForest (contamination=0.05)
+Numerical: Mean Imputation | Outliers handled with IsolationForest (contamination=0.05)
+Numerical: Mean Imputation | Outliers handled with IsolationForest (contamination=0.05)
+Numerical: Mean Imputation | Outliers handled with IsolationForest (contamination=0.05)
+Numerical: Mean Imputation | Outliers handled with IsolationForest (contamination=0.05)
+Numerical: Mean Imputation | Outliers handled with IsolationForest (contamination=0.05)
+Numerical: Mean Imputation | Outliers handled with IsolationForest (contamination=0.05)
+Numerical: Mean Imputation | Outliers handled with IsolationForest (contamination=0.05)
+Numerical: Mean Imputation | Outliers handled with IsolationForest (contamination=0.05)
+Numerical: Mean Imputation | Outliers handled with IsolationForest (contamination=0.05)
+Numerical: Mean Imputation | Outliers handled with IsolationForest (contamination=0.05)

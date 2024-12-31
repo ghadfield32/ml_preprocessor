@@ -1,0 +1,16 @@
+Preprocessing Reason
+Categorical: Most_frequent Imputation
+Numerical: Median Imputation | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Median Imputation | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Median Imputation | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Median Imputation | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Median Imputation | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Median Imputation | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Median Imputation | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Median Imputation | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Median Imputation | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Median Imputation | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Median Imputation | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Median Imputation | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Median Imputation | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Median Imputation | Outliers handled with IQR Filtering (multiplier=1.5)

@@ -1,0 +1,16 @@
+Preprocessing Reason
+Categorical: Constant Imputation
+Numerical: Mean Imputation | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Mean Imputation | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Mean Imputation | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Mean Imputation | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Mean Imputation | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Mean Imputation | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Mean Imputation | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Mean Imputation | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Mean Imputation | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Mean Imputation | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Mean Imputation | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Mean Imputation | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Mean Imputation | Outliers handled with IQR Filtering (multiplier=1.5)
+Numerical: Mean Imputation | Outliers handled with IQR Filtering (multiplier=1.5)

@@ -1,0 +1,44 @@
+# config.yaml
+
+# Logging settings
+debug: true
+
+# SMOTE settings
+smote:
+  random_state: 42
+  sampling_strategy: auto
+  k_neighbors: 5
+
+# Datasets configurations
+datasets:
+  numerical_only:
+    target_variable: salary
+    numerical_features:
+      - age
+      - income
+    ordinal_features: []
+    nominal_features: []
+  
+  categorical_only:
+    target_variable: salary
+    numerical_features: []
+    ordinal_features:
+      - education_level
+      - experience
+    nominal_features:
+      - gender
+      - city
+      - department
+  
+  mixed:
+    target_variable: salary
+    numerical_features:
+      - age
+      - income
+    ordinal_features:
+      - education_level
+      - experience
+    nominal_features:
+      - gender
+      - city
+      - department

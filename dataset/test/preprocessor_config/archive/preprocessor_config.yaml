@@ -1,0 +1,739 @@
+# preprocessor_config.yaml
+
+features:
+  ordinal_categoricals: []
+  nominal_categoricals: ['player_estimated_hand_length_cm_category']
+  numericals:
+    - release_ball_direction_x
+    - release_ball_direction_z
+    - release_ball_direction_y
+    - elbow_release_angle
+    - elbow_max_angle
+    - wrist_release_angle
+    - wrist_max_angle
+    - knee_release_angle
+    - knee_max_angle
+    - release_ball_speed
+    - calculated_release_angle
+    - release_ball_velocity_x
+    - release_ball_velocity_y
+    - release_ball_velocity_z
+  y_variable:
+    - result
+
+execution:
+  shared:
+    config_path: '../../ml-preprocessing-utils/data/dataset/test/preprocessor_config/preprocessor_config.yaml'
+    features_metadata_path: '../../ml-preprocessing-utils/data/dataset/test/features_info/features_metadata.pkl'
+    plot_output_dir: '../../ml-preprocessing-utils/data/dataset/test/plots'
+    dataset_output_dir: '../../ml-preprocessing-utils/data/dataset/test/data'
+    # Inherit normalization settings from shared unless overridden
+    normalize_debug: false
+    normalize_graphs_output: false
+
+  train:
+    mode: train
+    input_path: '../../ml-preprocessing-utils/data/dataset/test/data/final_ml_dataset.csv'
+    output_dir: '../../ml-preprocessing-utils/data/dataset/test/processed_data'
+    training_output_dir: '../../ml-preprocessing-utils/data/dataset/test/training_output'
+    save_transformers_path: '../../ml-preprocessing-utils/data/dataset/test/transformers/transformers.pkl'
+    model_save_path: '../../ml-preprocessing-utils/data/dataset/test/models'  # New entry
+    normalize_debug: false  # Override if needed
+    normalize_graphs_output: false  # Override if needed
+
+  predict:
+    mode: predict
+    load_transformers_path: '../../ml-preprocessing-utils/data/dataset/test/transformers/transformers.pkl'
+    prediction_input_path: '../../ml-preprocessing-utils/data/dataset/test/data/final_ml_dataset.csv'
+    trained_model_path: '../../ml-preprocessing-utils/data/dataset/test/models/XGBoost_model.pkl'  # Updated path
+    predictions_output_path: '../../ml-preprocessing-utils/data/dataset/test/data'
+    normalize_debug: true  # Override if needed
+    normalize_graphs_output: false  # Override if needed
+
+  clustering:
+    mode: clustering
+    clustering_input_path: '../../ml-preprocessing-utils/data/dataset/test/data/final_ml_dataset.csv'  # Path to clustering data
+    clustering_output_dir: '../../ml-preprocessing-utils/data/dataset/test/clustering_output'  # Path to save clustering results
+    normalize_debug: false  # Override if needed
+    normalize_graphs_output: false  # Override if needed
+    save_transformers_path: '../../ml-preprocessing-utils/data/dataset/test/transformers/transformers.pkl'
+
+models:
+
+  # -----------------------------------------------------------
+  # 1. Tree Based Classifier (Classification)
+  # -----------------------------------------------------------
+  "Tree Based Classifier":
+    split_dataset:
+      test_size: 0.2  # DEFAULT: 0.2
+      random_state: 42  # DEFAULT: 42
+      stratify_for_classification: true  # DEFAULT: true (stratify based on target variable)
+
+    handle_missing_values:
+      numerical_strategy:
+        strategy: median  # DEFAULT: median (options: mean, median, most_frequent, constant)
+        imputer: SimpleImputer  # DEFAULT: SimpleImputer (options: SimpleImputer, KNNImputer)
+      categorical_strategy:
+        strategy: most_frequent  # DEFAULT: most_frequent (options: most_frequent, constant)
+        imputer: SimpleImputer  # DEFAULT: SimpleImputer (options: SimpleImputer, ConstantImputer)
+        fill_value: "Missing"  # DEFAULT: "Missing" (applicable if strategy is 'constant')
+
+    test_normality:
+      p_value_threshold: 0.05  # DEFAULT: 0.05
+      skewness_threshold: 1.0  # DEFAULT: 1.0
+      use_p_value_other_models: false  # DEFAULT: false
+
+    handle_outliers:
+      zscore_threshold: 3  # DEFAULT: 3
+      iqr_multiplier: 1.5  # DEFAULT: 1.5
+      apply_zscore: false  # DEFAULT: false
+      apply_iqr: true  # DEFAULT: true
+      apply_winsor: false  # DEFAULT: false
+      winsor_limits: [0.05, 0.05]  # DEFAULT: [0.05, 0.05]
+      apply_isolation_forest: false  # DEFAULT: false
+      contamination: 0.05  # DEFAULT: 0.05
+
+    choose_transformations:
+      method: power  # DEFAULT: power (options: power, log, none)
+      power_method: yeo-johnson  # DEFAULT: yeo-johnson (options: yeo-johnson, box-cox)
+      skewness_threshold: 1.0  # DEFAULT: 1.0
+
+    encode_categoricals:
+      ordinal_encoding: OrdinalEncoder  # DEFAULT: OrdinalEncoder (options: OrdinalEncoder, None)
+      nominal_encoding: OneHotEncoder  # DEFAULT: OneHotEncoder (options: OneHotEncoder, OrdinalEncoder, FrequencyEncoder, None)
+      handle_unknown: error  # DEFAULT: ignore (only applicable for OneHotEncoder)
+
+    apply_scaling:
+      method: StandardScaler  # DEFAULT: StandardScaler (options: StandardScaler, MinMaxScaler, RobustScaler, None)
+
+    implement_smote:
+      variant:  # DEFAULT: SMOTENC if numeric+categorical, SMOTEN if categorical, and numeric only: (options: SMOTE, SMOTENC, BorderlineSMOTE, ADASYN, null)
+      params:
+        k_neighbors: 5  # DEFAULT: 5
+        sampling_strategy: 'auto'  # DEFAULT: 'auto'
+
+    # Debug flags for each step
+    debug_split_dataset: true  # DEFAULT: false
+    debug_handle_missing_values: true  # DEFAULT: false
+    debug_test_normality: true  # DEFAULT: false
+    debug_handle_outliers: true  # DEFAULT: false
+    debug_choose_transformations: true  # DEFAULT: false
+    debug_encode_categoricals: true  # DEFAULT: false
+    debug_apply_scaling: true  # DEFAULT: false
+    debug_implement_smote: true  # DEFAULT: false
+    debug_final_inverse_transformations: true  # DEFAULT: false
+    debug_validate_inverse_transformations: true  # DEFAULT: false
+    debug_generate_recommendations: true  # DEFAULT: false
+    debug_save_transformers: true  # DEFAULT: false
+    debug_load_transformers: true  # DEFAULT: false
+
+  # -----------------------------------------------------------
+  # 3. K-Means Clustering (Clustering)
+  # -----------------------------------------------------------
+  "K-Means":
+    split_dataset:
+      test_size: null  # DEFAULT: null (No train-test split for clustering)
+      # Other Options:
+        # - test_size: float (e.g., 0.25)
+        # - test_size: int (e.g., 150)
+      random_state: 42  # DEFAULT: 42 (seed for reproducibility)
+      # Other Options:
+        # - random_state: Any integer for reproducibility
+      stratify_for_classification: false  # DEFAULT: false (not applicable for clustering)
+
+    handle_missing_values:
+      numerical_strategy:
+        strategy: mean  # DEFAULT: mean (options: mean, median, most_frequent, constant)
+        imputer: SimpleImputer  # DEFAULT: SimpleImputer (options: SimpleImputer, KNNImputer)
+        # Additional Options for Specific Imputers:
+          # If imputer is KNNImputer:
+            # knn_neighbors: 5  # DEFAULT: 5
+
+      categorical_strategy:
+        strategy: most_frequent  # DEFAULT: most_frequent (options: most_frequent, constant)
+        imputer: SimpleImputer  # DEFAULT: SimpleImputer (options: SimpleImputer, ConstantImputer)
+        fill_value: "Missing"  # DEFAULT: "Missing" (applicable if strategy is 'constant')
+
+    test_normality:
+      p_value_threshold: 0.05  # DEFAULT: 0.05
+      skewness_threshold: 1.0  # DEFAULT: 1.0
+      use_p_value_other_models: false  # DEFAULT: false
+
+    handle_outliers:
+      zscore_threshold: 3  # DEFAULT: 3
+      iqr_multiplier: 1.5  # DEFAULT: 1.5
+      apply_zscore: true  # DEFAULT: true
+      apply_iqr: true  # DEFAULT: true
+      apply_winsor: false  # DEFAULT: false
+      winsor_limits: [0.05, 0.05]  # DEFAULT: [0.05, 0.05]
+      apply_isolation_forest: false  # DEFAULT: false
+      contamination: 0.05  # DEFAULT: 0.05
+
+    choose_transformations:
+      method: power  # DEFAULT: power (options: power, log, none)
+      # Other Options:
+        # - method: log
+        # - method: none
+      power_method: yeo-johnson  # DEFAULT: yeo-johnson (options: yeo-johnson, box-cox)
+      # Only applicable if method is 'power'
+      skewness_threshold: 1.0  # DEFAULT: 1.0
+
+    encode_categoricals:
+      ordinal_encoding: OrdinalEncoder  # DEFAULT: OrdinalEncoder (options: OrdinalEncoder, None)
+      # Other Options:
+        # - ordinal_encoding: None
+      nominal_encoding: OrdinalEncoder  # DEFAULT: OrdinalEncoder (options: OneHotEncoder, OrdinalEncoder, FrequencyEncoder, None)
+      # Other Options:
+        # - nominal_encoding: OneHotEncoder
+        # - nominal_encoding: FrequencyEncoder
+        # - nominal_encoding: None
+      handle_unknown: ignore  # DEFAULT: ignore (only applicable for OneHotEncoder)
+
+    apply_scaling:
+      method: MinMaxScaler  # DEFAULT: MinMaxScaler (options: StandardScaler, MinMaxScaler, RobustScaler, None)
+      # Other Options:
+        # - method: StandardScaler
+        # - method: RobustScaler
+        # - method: None
+
+    implement_smote:
+      variant: null  # DEFAULT: null (No SMOTE applied)
+      # SMOTE is typically not used for clustering
+      params: {}  # DEFAULT: empty dict
+
+    inverse_transformations:
+      inverse_scaling: false  # DEFAULT: false (options: true, false)
+      # Only applicable if apply_scaling is performed
+      inverse_transformation: false  # DEFAULT: false (options: true, false)
+      # Only applicable if choose_transformations is performed
+      inverse_encoding: false  # DEFAULT: false (options: true, false)
+      # Only applicable if encode_categoricals is performed
+
+    clustering_model_params:
+      n_clusters: 3
+      init: 'k-means++'
+      n_init: 10
+      max_iter: 300
+
+    # Debug flags for each step
+    debug_split_dataset: false  # DEFAULT: false
+    debug_handle_missing_values: true  # DEFAULT: false
+    debug_test_normality: true  # DEFAULT: false
+    debug_handle_outliers: true  # DEFAULT: false
+    debug_choose_transformations: true  # DEFAULT: false
+    debug_encode_categoricals: true  # DEFAULT: false
+    debug_apply_scaling: true  # DEFAULT: false
+    debug_implement_smote: false  # DEFAULT: false
+    debug_final_inverse_transformations: true  # DEFAULT: false
+    debug_validate_inverse_transformations: true  # DEFAULT: false
+    debug_generate_recommendations: true  # DEFAULT: false
+
+
+
+
+#   # -----------------------------------------------------------
+#   # 2. Logistic Regression (Classification)
+#   # -----------------------------------------------------------
+#   "Logistic Regression":
+#     split_dataset:
+#       test_size: 0.25  # DEFAULT: 0.25 (proportion of dataset to include in the test split)
+#       # Other Options:
+#         # - test_size: float (e.g., 0.3)
+#         # - test_size: int (e.g., 150)
+#       random_state: 42  # DEFAULT: 42 (seed for reproducibility)
+#       # Other Options:
+#         # - random_state: Any integer for reproducibility
+#       stratify_for_classification: true  # DEFAULT: true (stratify based on target variable)
+
+#     handle_missing_values:
+#       numerical_strategy:
+#         strategy: mean  # DEFAULT: mean (options: mean, median, most_frequent, constant)
+#         imputer: SimpleImputer  # DEFAULT: SimpleImputer (options: SimpleImputer, KNNImputer)
+#         # Additional Options for Specific Imputers:
+#           # If imputer is KNNImputer:
+#             # knn_neighbors: 5  # DEFAULT: 5
+
+#       categorical_strategy:
+#         strategy: most_frequent  # DEFAULT: most_frequent (options: most_frequent, constant)
+#         imputer: SimpleImputer  # DEFAULT: SimpleImputer (options: SimpleImputer, ConstantImputer)
+#         fill_value: "Missing"  # DEFAULT: "Missing" (applicable if strategy is 'constant')
+
+#     test_normality:
+#       p_value_threshold: 0.05  # DEFAULT: 0.05 (threshold for normality based on statistical tests)
+#       skewness_threshold: 1.0  # DEFAULT: 1.0 (threshold for skewness to decide on transformations)
+#       use_p_value_other_models: false  # DEFAULT: false (whether to apply p-value considerations for other models)
+
+#     handle_outliers:
+#       zscore_threshold: 3  # DEFAULT: 3 (threshold for z-score based outlier detection)
+#       iqr_multiplier: 1.5  # DEFAULT: 1.5 (multiplier for IQR to detect outliers)
+#       apply_zscore: true  # DEFAULT: true (whether to apply z-score filtering)
+#       apply_iqr: true  # DEFAULT: true (whether to apply IQR filtering)
+#       apply_winsor: false  # DEFAULT: false (whether to apply Winsorization)
+#       winsor_limits: [0.05, 0.05]  # DEFAULT: [0.05, 0.05] (applicable if apply_winsor is true)
+#       apply_isolation_forest: false  # DEFAULT: false (whether to use Isolation Forest for outlier detection)
+#       contamination: 0.05  # DEFAULT: 0.05 (estimated proportion of outliers if apply_isolation_forest is true)
+
+#     choose_transformations:
+#       method: power  # DEFAULT: power (options: power, log, none)
+#       # Other Options:
+#         # - method: log
+#         # - method: none
+#       power_method: yeo-johnson  # DEFAULT: yeo-johnson (options: yeo-johnson, box-cox)
+#       # Only applicable if method is 'power'
+#       skewness_threshold: 1.0  # DEFAULT: 1.0 (skewness level to trigger transformations)
+
+#     encode_categoricals:
+#       ordinal_encoding: OrdinalEncoder  # DEFAULT: OrdinalEncoder (options: OrdinalEncoder, None)
+#       # Other Options:
+#         # - ordinal_encoding: None
+#       nominal_encoding: OrdinalEncoder  # DEFAULT: OrdinalEncoder (options: OneHotEncoder, OrdinalEncoder, FrequencyEncoder, None)
+#       # Other Options:
+#         # - nominal_encoding: OneHotEncoder
+#         # - nominal_encoding: FrequencyEncoder
+#         # - nominal_encoding: None
+#       handle_unknown: ignore  # DEFAULT: ignore (only applicable for OneHotEncoder)
+
+#     apply_scaling:
+#       method: StandardScaler  # DEFAULT: StandardScaler (options: StandardScaler, MinMaxScaler, RobustScaler, None)
+#       # Other Options:
+#         # - method: MinMaxScaler
+#         # - method: RobustScaler
+#         # - method: None
+#       features:
+#         - release_ball_direction_x
+#         - release_ball_direction_z
+#         - release_ball_direction_y
+#         - elbow_release_angle
+#         - elbow_max_angle
+#         - wrist_release_angle
+#         - wrist_max_angle
+#         - knee_release_angle
+#         - knee_max_angle
+#         - release_ball_speed
+#         - calculated_release_angle
+#         - release_ball_velocity_x
+#         - release_ball_velocity_y
+#         - release_ball_velocity_z
+#       # Other Options:
+#         # - features: list of specific features to scale
+
+#     implement_smote:
+#       variant: SMOTENC  # DEFAULT: null (No SMOTE applied)
+#       # Other Options:
+#         # - variant: SMOTE
+#         # - variant: SMOTENC
+#         # - variant: BorderlineSMOTE
+#       params:
+#         k_neighbors: 5  # DEFAULT: 5 (number of neighbors)
+#         sampling_strategy: 'auto'  # DEFAULT: 'auto' (strategy for sampling)
+#         # Other Options:
+#           # - sampling_strategy: float (e.g., 0.1 for 10% minority)
+#           # - sampling_strategy: dict (e.g., {'class_0': 100, 'class_1': 200})
+
+#     inverse_transformations:
+#       inverse_scaling: true  # DEFAULT: true (whether to inverse transform scaling)
+#       # Only applicable if apply_scaling is performed
+#       inverse_transformation: true  # DEFAULT: true (whether to inverse transform data transformations)
+#       # Only applicable if choose_transformations is performed
+#       inverse_encoding: true  # DEFAULT: true (whether to inverse transform categorical encodings)
+#       # Only applicable if encode_categoricals is performed
+
+#     # Debug flags for each step
+#     debug_split_dataset: false  # DEFAULT: false
+#     debug_handle_missing_values: false  # DEFAULT: false
+#     debug_test_normality: false  # DEFAULT: false
+#     debug_handle_outliers: false  # DEFAULT: false
+#     debug_choose_transformations: false  # DEFAULT: false
+#     debug_encode_categoricals: false  # DEFAULT: false
+#     debug_apply_scaling: false  # DEFAULT: false
+#     debug_implement_smote: false  # DEFAULT: false
+#     debug_final_inverse_transformations: false  # DEFAULT: false
+#     debug_validate_inverse_transformations: false  # DEFAULT: false
+#     debug_generate_recommendations: false  # DEFAULT: false
+
+
+  # # -----------------------------------------------------------
+  # # 4. Linear Regression (Regression)
+  # # -----------------------------------------------------------
+  # "Linear Regression":
+  #   split_dataset:
+  #     test_size: 0.2  # DEFAULT: 0.2
+  #     # Other Options:
+  #       # - test_size: float (e.g., 0.3)
+  #       # - test_size: int (e.g., 100)
+  #     random_state: 42  # DEFAULT: 42
+  #     # Other Options:
+  #       # - random_state: Any integer for reproducibility
+  #     stratify_for_classification: false  # DEFAULT: false (not applicable for regression)
+
+  #   handle_missing_values:
+  #     numerical_strategy:
+  #       strategy: mean  # DEFAULT: mean (options: mean, median, most_frequent, constant)
+  #       imputer: SimpleImputer  # DEFAULT: SimpleImputer (options: SimpleImputer, KNNImputer)
+  #       # Additional Options for Specific Imputers:
+  #         # If imputer is KNNImputer:
+  #           # knn_neighbors: 5  # DEFAULT: 5
+
+  #     categorical_strategy:
+  #       strategy: most_frequent  # DEFAULT: most_frequent (options: most_frequent, constant)
+  #       imputer: SimpleImputer  # DEFAULT: SimpleImputer (options: SimpleImputer, ConstantImputer)
+  #       fill_value: "Missing"  # DEFAULT: "Missing" (applicable if strategy is 'constant')
+
+  #   test_normality:
+  #     p_value_threshold: 0.05  # DEFAULT: 0.05
+  #     skewness_threshold: 1.0  # DEFAULT: 1.0
+  #     use_p_value_other_models: false  # DEFAULT: false
+
+  #   handle_outliers:
+  #     zscore_threshold: 3  # DEFAULT: 3
+  #     iqr_multiplier: 1.5  # DEFAULT: 1.5
+  #     apply_zscore: true  # DEFAULT: true (options: true, false)
+  #     apply_iqr: true  # DEFAULT: true (options: true, false)
+  #     apply_winsor: false  # DEFAULT: false (options: true, false)
+  #     winsor_limits: [0.05, 0.05]  # DEFAULT: [0.05, 0.05]
+  #     apply_isolation_forest: false  # DEFAULT: false (options: true, false)
+  #     contamination: 0.05  # DEFAULT: 0.05
+
+  #   choose_transformations:
+  #     method: power  # DEFAULT: power (options: power, log, none)
+  #     # Other Options:
+  #       # - method: log
+  #       # - method: none
+  #     power_method: yeo-johnson  # DEFAULT: yeo-johnson (options: yeo-johnson, box-cox)
+  #     # Only applicable if method is 'power'
+  #     skewness_threshold: 1.0  # DEFAULT: 1.0
+
+  #   encode_categoricals:
+  #     ordinal_encoding: OrdinalEncoder  # DEFAULT: OrdinalEncoder (options: OrdinalEncoder, None)
+  #     # Other Options:
+  #       # - ordinal_encoding: None
+  #     nominal_encoding: OneHotEncoder  # DEFAULT: OneHotEncoder (options: OneHotEncoder, OrdinalEncoder, FrequencyEncoder, None)
+  #     # Other Options:
+  #       # - nominal_encoding: OrdinalEncoder
+  #       # - nominal_encoding: FrequencyEncoder
+  #       # - nominal_encoding: None
+  #     handle_unknown: ignore  # DEFAULT: ignore (only applicable for OneHotEncoder)
+
+  #   apply_scaling:
+  #     method: StandardScaler  # DEFAULT: StandardScaler (options: StandardScaler, MinMaxScaler, RobustScaler, None)
+  #     # Other Options:
+  #       # - method: MinMaxScaler
+  #       # - method: RobustScaler
+  #       # - method: None
+  #     features:
+  #       - release_ball_direction_x
+  #       - release_ball_direction_z
+  #       - release_ball_direction_y
+  #       - elbow_release_angle
+  #       - elbow_max_angle
+  #       - wrist_release_angle
+  #       - wrist_max_angle
+  #       - knee_release_angle
+  #       - knee_max_angle
+  #       - release_ball_speed
+  #       - calculated_release_angle
+  #       - release_ball_velocity_x
+  #       - release_ball_velocity_y
+  #       - release_ball_velocity_z
+  #     # Other Options:
+  #       # - features: list of specific features to scale
+
+  #   implement_smote:
+  #     variant: null  # DEFAULT: null (No SMOTE applied)
+  #     # SMOTE is typically used for classification, not regression
+  #     params: {}  # DEFAULT: empty dict
+
+  #   inverse_transformations:
+  #     inverse_scaling: true  # DEFAULT: true
+  #     # Only applicable if apply_scaling is performed
+  #     inverse_transformation: true  # DEFAULT: true
+  #     # Only applicable if choose_transformations is performed
+  #     inverse_encoding: true  # DEFAULT: true
+  #     # Only applicable if encode_categoricals is performed
+
+  #   # Debug flags for each step
+  #   debug_split_dataset: true  # DEFAULT: false
+  #   debug_handle_missing_values: true  # DEFAULT: false
+  #   debug_test_normality: true  # DEFAULT: false
+  #   debug_handle_outliers: true  # DEFAULT: false
+  #   debug_choose_transformations: true  # DEFAULT: false
+  #   debug_encode_categoricals: true  # DEFAULT: false
+  #   debug_apply_scaling: true  # DEFAULT: false
+  #   debug_implement_smote: false  # DEFAULT: false
+  #   debug_final_inverse_transformations: true  # DEFAULT: false
+  #   debug_validate_inverse_transformations: true  # DEFAULT: false
+  #   debug_generate_recommendations: true  # DEFAULT: false
+
+  # # -----------------------------------------------------------
+  # # 5. Tree Based Regressor (Regression)
+  # # -----------------------------------------------------------
+  # "Tree Based Regressor":
+  #   split_dataset:
+  #     test_size: 0.2  # DEFAULT: 0.2
+  #     # Other Options:
+  #       # - test_size: float (e.g., 0.25)
+  #       # - test_size: int (e.g., 200)
+  #     random_state: 42  # DEFAULT: 42
+  #     # Other Options:
+  #       # - random_state: Any integer for reproducibility
+  #     stratify_for_classification: false  # DEFAULT: false (not applicable for regression)
+
+  #   handle_missing_values:
+  #     numerical_strategy:
+  #       strategy: median  # DEFAULT: median (options: mean, median, most_frequent, constant)
+  #       imputer: SimpleImputer  # DEFAULT: SimpleImputer (options: SimpleImputer, KNNImputer)
+  #       # Additional Options for Specific Imputers:
+  #         # If imputer is KNNImputer:
+  #           # knn_neighbors: 5  # DEFAULT: 5
+
+  #     categorical_strategy:
+  #       strategy: most_frequent  # DEFAULT: most_frequent (options: most_frequent, constant)
+  #       imputer: SimpleImputer  # DEFAULT: SimpleImputer (options: SimpleImputer, ConstantImputer)
+  #       fill_value: "Missing"  # DEFAULT: "Missing" (applicable if strategy is 'constant')
+
+  #   test_normality:
+  #     p_value_threshold: 0.05  # DEFAULT: 0.05
+  #     skewness_threshold: 1.0  # DEFAULT: 1.0
+  #     use_p_value_other_models: false  # DEFAULT: false
+
+  #   handle_outliers:
+  #     zscore_threshold: 3  # DEFAULT: 3
+  #     iqr_multiplier: 1.5  # DEFAULT: 1.5
+  #     apply_zscore: false  # DEFAULT: false
+  #     apply_iqr: true  # DEFAULT: true
+  #     apply_winsor: false  # DEFAULT: false
+  #     winsor_limits: [0.05, 0.05]  # DEFAULT: [0.05, 0.05]
+  #     apply_isolation_forest: false  # DEFAULT: false
+  #     contamination: 0.05  # DEFAULT: 0.05
+
+  #   choose_transformations:
+  #     method: none  # DEFAULT: power (options: power, log, none)
+  #     # Other Options:
+  #       # - method: power
+  #       # - method: log
+  #     skewness_threshold: 1.0  # DEFAULT: 1.0
+  #     # power_method is not applicable when method is 'none'
+
+  #   encode_categoricals:
+  #     ordinal_encoding: OrdinalEncoder  # DEFAULT: OrdinalEncoder (options: OrdinalEncoder, None)
+  #     # Other Options:
+  #       # - ordinal_encoding: None
+  #     nominal_encoding: OrdinalEncoder  # DEFAULT: OrdinalEncoder (options: OneHotEncoder, OrdinalEncoder, FrequencyEncoder, None)
+  #     # Other Options:
+  #       # - nominal_encoding: OneHotEncoder
+  #       # - nominal_encoding: FrequencyEncoder
+  #       # - nominal_encoding: None
+  #     handle_unknown: ignore  # DEFAULT: ignore (only applicable for OneHotEncoder)
+
+  #   apply_scaling:
+  #     method: none  # DEFAULT: none (options: StandardScaler, MinMaxScaler, RobustScaler, None)
+  #     # Other Options:
+  #       # - method: StandardScaler
+  #       # - method: MinMaxScaler
+  #       # - method: RobustScaler
+  #       # - method: None
+  #     features: []  # DEFAULT: [] (no scaling applied)
+
+  #   implement_smote:
+  #     variant: null  # DEFAULT: null (No SMOTE applied)
+  #     # SMOTE is typically used for classification, not regression
+  #     params: {}  # DEFAULT: empty dict
+
+  #   inverse_transformations:
+  #     inverse_scaling: true  # DEFAULT: true
+  #     # Only applicable if apply_scaling is performed
+  #     inverse_transformation: true  # DEFAULT: true
+  #     # Only applicable if choose_transformations is performed
+  #     inverse_encoding: true  # DEFAULT: true
+  #     # Only applicable if encode_categoricals is performed
+
+  #   # Debug flags for each step
+  #   debug_split_dataset: false  # DEFAULT: false
+  #   debug_handle_missing_values: true  # DEFAULT: false
+  #   debug_test_normality: true  # DEFAULT: false
+  #   debug_handle_outliers: true  # DEFAULT: false
+  #   debug_choose_transformations: true  # DEFAULT: false
+  #   debug_encode_categoricals: true  # DEFAULT: false
+  #   debug_apply_scaling: true  # DEFAULT: false
+  #   debug_implement_smote: false  # DEFAULT: false
+  #   debug_final_inverse_transformations: true  # DEFAULT: false
+  #   debug_validate_inverse_transformations: true  # DEFAULT: false
+  #   debug_generate_recommendations: true  # DEFAULT: false
+
+  # # -----------------------------------------------------------
+  # # 6. Add More Models Below as Needed
+  # # -----------------------------------------------------------
+  # "Support Vector Machine":
+  #   split_dataset:
+  #     test_size: 0.3  # DEFAULT: 0.3
+  #     random_state: 100  # DEFAULT: 42
+  #     stratify_for_classification: true  # DEFAULT: true
+  #   handle_missing_values:
+  #     numerical_strategy:
+  #       strategy: mean  # DEFAULT: mean (options: mean, median, most_frequent, constant)
+  #       imputer: KNNImputer  # DEFAULT: SimpleImputer (options: SimpleImputer, KNNImputer)
+  #       knn_neighbors: 5  # DEFAULT: 5
+  #     categorical_strategy:
+  #       strategy: constant  # DEFAULT: most_frequent
+  #       imputer: SimpleImputer  # DEFAULT: SimpleImputer (options: SimpleImputer, ConstantImputer)
+  #       fill_value: "Unknown"  # DEFAULT: "Missing"
+  #   test_normality:
+  #     p_value_threshold: 0.05  # DEFAULT: 0.05
+  #     skewness_threshold: 0.7  # DEFAULT: 1.0
+  #     use_p_value_other_models: true  # DEFAULT: false
+  #   handle_outliers:
+  #     zscore_threshold: 2.5  # DEFAULT: 3
+  #     iqr_multiplier: 1.2  # DEFAULT: 1.5
+  #     apply_zscore: true  # DEFAULT: true
+  #     apply_iqr: true  # DEFAULT: true
+  #     apply_winsor: true  # DEFAULT: false
+  #     winsor_limits: [0.05, 0.05]  # DEFAULT: [0.05, 0.05]
+  #     apply_isolation_forest: true  # DEFAULT: false
+  #     contamination: 0.05  # DEFAULT: 0.05
+  #   choose_transformations:
+  #     method: log  # DEFAULT: power (options: power, log, none)
+  #     skewness_threshold: 0.6  # DEFAULT: 1.0
+  #   encode_categoricals:
+  #     ordinal_encoding: OrdinalEncoder  # DEFAULT: OrdinalEncoder (options: OrdinalEncoder, None)
+  #     nominal_encoding: OneHotEncoder  # DEFAULT: OrdinalEncoder (options: OneHotEncoder, OrdinalEncoder, FrequencyEncoder, None)
+  #     handle_unknown: ignore  # DEFAULT: ignore (only applicable for OneHotEncoder)
+  #   apply_scaling:
+  #     method: StandardScaler  # DEFAULT: MinMaxScaler (options: StandardScaler, MinMaxScaler, RobustScaler, None)
+  #     features:
+  #       - release_ball_direction_x
+  #       - release_ball_direction_z
+  #       # ... other numerical features ...
+  #   implement_smote:
+  #     variant: null  # DEFAULT: null (No SMOTE applied)
+  #     params: {}  # DEFAULT: empty dict
+  #   inverse_transformations:
+  #     inverse_scaling: false  # DEFAULT: false (options: true, false)
+  #     inverse_transformation: false  # DEFAULT: false (options: true, false)
+  #     inverse_encoding: false  # DEFAULT: false (options: true, false)
+  #   # Debug flags for each step
+  #   debug_split_dataset: false
+  #   debug_handle_missing_values: false
+  #   debug_test_normality: false
+  #   debug_handle_outliers: false
+  #   debug_choose_transformations: false
+  #   debug_encode_categoricals: false
+  #   debug_apply_scaling: false
+  #   debug_implement_smote: false
+  #   debug_final_inverse_transformations: false
+  #   debug_validate_inverse_transformations: false
+  #   debug_generate_recommendations: false
+
+# -----------------------------------------------------------
+# Explanation of Configuration Sections
+# -----------------------------------------------------------
+
+# 1. Features Section
+# --------------------
+# Defines the different types of features in your dataset.
+# - `ordinal_categoricals`: Categorical features with an inherent order.
+# - `nominal_categoricals`: Categorical features without any order.
+# - `numericals`: Numerical features for regression, classification, or clustering.
+# - `y_variable`: Target variable(s) for supervised learning models.
+
+# 2. Models Section
+# ------------------
+# Contains preprocessing configurations tailored for each machine learning model.
+# Each model (e.g., "Logistic Regression") has its own subsection with specific preprocessing options.
+
+# For each model, the following preprocessing steps can be configured:
+
+# a. split_dataset
+# -----------------
+# - `test_size`: Proportion or absolute number of samples for the test split.
+# - `random_state`: Seed for reproducibility.
+# - `stratify_for_classification`: Whether to stratify the split based on the target variable (typically `true` for classification).
+
+# b. handle_missing_values
+# ------------------------
+# - `numerical_strategy`:
+#     - `strategy`: Method to impute numerical missing values (mean, median, most_frequent, constant).
+#     - `imputer`: Imputer type (`SimpleImputer`, `KNNImputer`).
+#     - `knn_neighbors`: Number of neighbors for `KNNImputer` (if applicable).
+# - `categorical_strategy`:
+#     - `strategy`: Method to impute categorical missing values (most_frequent, constant).
+#     - `imputer`: Imputer type (`SimpleImputer`, `ConstantImputer`).
+#     - `fill_value`: Value to fill if `strategy` is 'constant'.
+
+# c. test_normality
+# -----------------
+# - `p_value_threshold`: Threshold for determining normality based on statistical tests.
+# - `skewness_threshold`: Threshold for skewness to decide on transformations.
+# - `use_p_value_other_models`: Whether to apply p-value considerations for models other than classification, regression, and clustering.
+
+# d. handle_outliers
+# ------------------
+# - `zscore_threshold`: Threshold for z-score based outlier detection.
+# - `iqr_multiplier`: Multiplier for the Interquartile Range (IQR) to detect outliers.
+# - `apply_zscore`: Whether to apply z-score filtering.
+# - `apply_iqr`: Whether to apply IQR filtering.
+# - `apply_winsor`: Whether to apply Winsorization to cap extreme values.
+# - `winsor_limits`: Limits for Winsorization (if applicable).
+# - `apply_isolation_forest`: Whether to use Isolation Forest for outlier detection.
+# - `contamination`: Estimated proportion of outliers in the data (if applicable).
+
+# e. choose_transformations
+# -------------------------
+# - `method`: Transformation method to apply based on data skewness (power, log, none).
+# - `power_method`: Specific method for power transformations (`yeo-johnson`, `box-cox`).
+# - `skewness_threshold`: Skewness level to trigger transformations.
+
+# f. encode_categoricals
+# -----------------------
+# - `ordinal_encoding`: Encoding method for ordinal categorical variables (`OrdinalEncoder`, `None`).
+# - `nominal_encoding`: Encoding method for nominal categorical variables (`OneHotEncoder`, `OrdinalEncoder`, `FrequencyEncoder`, `None`).
+# - `handle_unknown`: Strategy for handling unknown categories during encoding (`ignore`, `error`).
+
+# g. apply_scaling
+# ----------------
+# - `method`: Scaling method to apply to numerical features (`StandardScaler`, `MinMaxScaler`, `RobustScaler`, `None`).
+# - `features`: Specific features to scale. By default, all numerical features are scaled.
+
+# h. implement_smote
+# ------------------
+# - `variant`: Type of SMOTE to apply for handling class imbalance (`SMOTE`, `SMOTENC`, `BorderlineSMOTE`, `null` for no SMOTE).
+# - `params`:
+#     - `k_neighbors`: Number of neighbors for SMOTE.
+#     - `sampling_strategy`: Strategy for sampling (`auto`, float for percentage, dict for specific class counts).
+
+# i. inverse_transformations
+# --------------------------
+# - `inverse_scaling`: Whether to inverse transform the scaling on the scaled features.
+# - `inverse_transformation`: Whether to inverse transform the data transformations.
+# - `inverse_encoding`: Whether to inverse transform the categorical encodings.
+
+# j. Debug Flags
+# --------------
+# - `debug_split_dataset`: Enable detailed logging for dataset splitting.
+# - `debug_handle_missing_values`: Enable detailed logging for handling missing values.
+# - `debug_test_normality`: Enable detailed logging for normality testing.
+# - `debug_handle_outliers`: Enable detailed logging for outlier handling.
+# - `debug_choose_transformations`: Enable detailed logging for choosing and applying transformations.
+# - `debug_encode_categoricals`: Enable detailed logging for encoding categorical variables.
+# - `debug_apply_scaling`: Enable detailed logging for scaling.
+# - `debug_implement_smote`: Enable detailed logging for SMOTE implementation.
+# - `debug_final_inverse_transformations`: Enable detailed logging for inverse transformations.
+# - `debug_validate_inverse_transformations`: Enable detailed logging for validating inverse transformations.
+# - `debug_generate_recommendations`: Enable detailed logging for generating preprocessing recommendations.
+
+# -----------------------------------------------------------
+# Usage Instructions
+# -----------------------------------------------------------
+
+# 1. Saving the Configuration File
+# ---------------------------------
+# Save the above content into a file named `config.yaml`.
+# Ensure this file is placed in a directory accessible to your preprocessing script, e.g., `/path/to/config.yaml`.
+
+# 2. Updating the Preprocessing Function to Use the Expanded Configuration
+# --------------------------------------------------------------------------
+# Ensure that your `run_preprocessing_pipeline` function in `preprocessing_pipeline.py` is designed to handle multiple models as defined in the `config.yaml`.
+# The function should iterate over each model, apply the specified preprocessing steps, and save the results accordingly.
+
+# 3. Example Usage in Other Modules
+# ----------------------------------
+# Here's how you can utilize the refactored `run_preprocessing_pipeline` function with the expanded `config.yaml`.

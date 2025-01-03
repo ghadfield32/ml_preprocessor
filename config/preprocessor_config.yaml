@@ -1,0 +1,501 @@
+# preprocessor_config.yaml
+
+current_model: "Tree Based Classifier"  # Change as needed
+
+# preprocessor_config.yaml
+
+# Add a new key at the root level
+model_types:
+  - "Tree Based Classifier"
+  - "Logistic Regression"
+  - "K-Means"
+  - "Linear Regression"
+  - "Tree Based Regressor"
+  - "Support Vector Machine"
+
+features:
+  ordinal_categoricals: []
+  nominal_categoricals: []
+  numericals:
+    - release_ball_direction_x
+    - release_ball_direction_z
+    - release_ball_direction_y
+    - elbow_release_angle
+    - elbow_max_angle
+    - wrist_release_angle
+    - wrist_max_angle
+    - knee_release_angle
+    - knee_max_angle
+    - release_ball_speed
+    - calculated_release_angle
+    - release_ball_velocity_x
+    - release_ball_velocity_y
+    - release_ball_velocity_z
+  y_variable:
+    - result
+
+execution:
+  shared:
+    config_path: '../../dataset/test/preprocessor_config/preprocessor_config.yaml'
+    features_metadata_path: '../../dataset/test/features_info/features_metadata.pkl'
+    plot_output_dir: '../../dataset/test/plots'
+    dataset_output_dir: '../../dataset/test/data'
+    normalize_debug: false
+    normalize_graphs_output: false
+
+  train:
+    mode: train
+    input_path: '../../dataset/test/data/final_ml_dataset.csv'  # Correct dataset path
+    output_dir: '../../dataset/test/processed_data'
+    training_output_dir: '../../dataset/test/training_output'
+    save_transformers_path: '../../dataset/test/transformers/'  # Ensure this is a directory
+    model_save_path: '../../dataset/test/models'  # Directory to save trained models
+    normalize_debug: false
+    normalize_graphs_output: false
+
+  predict:
+    mode: predict
+    load_transformers_path: '../../dataset/test/transformers/'  # Directory containing transformers.pkl
+    prediction_input_path: '../../dataset/test/data/final_ml_dataset.csv'  # Use appropriate prediction dataset
+    trained_model_path: '../../dataset/test/models/XGBoost_model.pkl'  # Path to the trained model
+    predictions_output_path: '../../dataset/test/data'  # Directory to save predictions
+    normalize_debug: true
+    normalize_graphs_output: false
+
+  clustering:
+    mode: clustering
+    clustering_input_path: '../../dataset/test/data/final_ml_dataset.csv'  # Use appropriate clustering dataset
+    clustering_output_dir: '../../dataset/test/clustering_output'  # Directory to save clustering results
+    normalize_debug: false
+    normalize_graphs_output: false
+    save_transformers_path: '../../dataset/test/transformers/'  # Ensure this is a directory
+
+
+models:
+
+  # -----------------------------------------------------------
+  # 1. Tree Based Classifier (Classification)
+  # -----------------------------------------------------------
+  "Tree Based Classifier":
+    split_dataset:
+      test_size: 0.2
+      random_state: 42
+      stratify_for_classification: true
+
+    handle_missing_values:
+      numerical_strategy:
+        strategy: median
+        imputer: SimpleImputer
+      categorical_strategy:
+        strategy: most_frequent
+        imputer: SimpleImputer
+        fill_value: "Missing"
+
+    test_normality:
+      p_value_threshold: 0.05
+      skewness_threshold: 1.0
+      use_p_value_other_models: false
+
+    handle_outliers:
+      zscore_threshold: 3
+      iqr_multiplier: 1.5
+      apply_zscore: false
+      apply_iqr: true
+      apply_winsor: false
+      winsor_limits: [0.05, 0.05]
+      apply_isolation_forest: false
+      contamination: 0.05
+
+    choose_transformations:
+      method: power
+      power_method: yeo-johnson
+      skewness_threshold: 1.0
+
+    encode_categoricals:
+      ordinal_encoding: OrdinalEncoder
+      nominal_encoding: OneHotEncoder
+      handle_unknown: ignore
+
+    apply_scaling:
+      method: StandardScaler
+      # Features refer to 'numericals' defined above
+
+    implement_smote:
+      variant: SMOTENC
+      params:
+        k_neighbors: 5
+        sampling_strategy: 'auto'
+
+    inverse_transformations:
+      inverse_scaling: true
+      inverse_transformation: true
+      inverse_encoding: true
+
+    # Debug flags for each step
+    debug_split_dataset: true
+    debug_handle_missing_values: true
+    debug_test_normality: true
+    debug_handle_outliers: true
+    debug_choose_transformations: true
+    debug_encode_categoricals: true
+    debug_apply_scaling: true
+    debug_implement_smote: true
+    debug_final_inverse_transformations: true
+    debug_validate_inverse_transformations: true
+    debug_generate_recommendations: true
+
+  # -----------------------------------------------------------
+  # 2. Logistic Regression (Classification)
+  # -----------------------------------------------------------
+  "Logistic Regression":
+    split_dataset:
+      test_size: 0.2
+      random_state: 42
+      stratify_for_classification: true
+
+    handle_missing_values:
+      numerical_strategy:
+        strategy: mean
+        imputer: SimpleImputer
+      categorical_strategy:
+        strategy: most_frequent
+        imputer: SimpleImputer
+        fill_value: "Missing"
+
+    test_normality:
+      p_value_threshold: 0.05
+      skewness_threshold: 1.0
+      use_p_value_other_models: false
+
+    handle_outliers:
+      zscore_threshold: 3
+      iqr_multiplier: 1.5
+      apply_zscore: false
+      apply_iqr: true
+      apply_winsor: false
+      winsor_limits: [0.05, 0.05]
+      apply_isolation_forest: false
+      contamination: 0.05
+
+    choose_transformations:
+      method: power
+      power_method: yeo-johnson
+      skewness_threshold: 1.0
+
+    encode_categoricals:
+      ordinal_encoding: OrdinalEncoder
+      nominal_encoding: OneHotEncoder
+      handle_unknown: ignore
+
+    apply_scaling:
+      method: StandardScaler
+      # Features refer to 'numericals' defined above
+
+    implement_smote:
+      variant: SMOTENC
+      params:
+        k_neighbors: 5
+        sampling_strategy: 'auto'
+
+    inverse_transformations:
+      inverse_scaling: true
+      inverse_transformation: true
+      inverse_encoding: true
+
+    # Debug flags for each step
+    debug_split_dataset: true
+    debug_handle_missing_values: true
+    debug_test_normality: true
+    debug_handle_outliers: true
+    debug_choose_transformations: true
+    debug_encode_categoricals: true
+    debug_apply_scaling: true
+    debug_implement_smote: true
+    debug_final_inverse_transformations: true
+    debug_validate_inverse_transformations: true
+    debug_generate_recommendations: true
+
+  # -----------------------------------------------------------
+  # 3. K-Means Clustering (Clustering)
+  # -----------------------------------------------------------
+  "K-Means":
+    split_dataset:
+      test_size: null
+      random_state: 42
+      stratify_for_classification: false
+
+    handle_missing_values:
+      numerical_strategy:
+        strategy: mean
+        imputer: SimpleImputer
+      categorical_strategy:
+        strategy: most_frequent
+        imputer: SimpleImputer
+        fill_value: "Missing"
+
+    test_normality:
+      p_value_threshold: 0.05
+      skewness_threshold: 1.0
+      use_p_value_other_models: false
+
+    handle_outliers:
+      zscore_threshold: 3
+      iqr_multiplier: 1.5
+      apply_zscore: true
+      apply_iqr: true
+      apply_winsor: false
+      winsor_limits: [0.05, 0.05]
+      apply_isolation_forest: false
+      contamination: 0.05
+
+    choose_transformations:
+      method: power
+      power_method: yeo-johnson
+      skewness_threshold: 1.0
+
+    encode_categoricals:
+      ordinal_encoding: OrdinalEncoder
+      nominal_encoding: OrdinalEncoder
+      handle_unknown: ignore
+
+    apply_scaling:
+      method: MinMaxScaler
+      # Features refer to 'numericals' defined above
+
+    implement_smote:
+      variant: null
+      params: {}
+
+    inverse_transformations:
+      inverse_scaling: true
+      inverse_transformation: true
+      inverse_encoding: true
+
+    clustering_model_params:
+      n_clusters: 3
+      init: 'k-means++'
+      n_init: 10
+      max_iter: 300
+
+    # Debug flags for each step
+    debug_split_dataset: true
+    debug_handle_missing_values: true
+    debug_test_normality: true
+    debug_handle_outliers: true
+    debug_choose_transformations: true
+    debug_encode_categoricals: true
+    debug_apply_scaling: true
+    debug_implement_smote: false
+    debug_final_inverse_transformations: true
+    debug_validate_inverse_transformations: true
+    debug_generate_recommendations: true
+
+  # -----------------------------------------------------------
+  # 4. Linear Regression (Regression)
+  # -----------------------------------------------------------
+  "Linear Regression":
+    split_dataset:
+      test_size: 0.2
+      random_state: 42
+      stratify_for_classification: false
+
+    handle_missing_values:
+      numerical_strategy:
+        strategy: mean
+        imputer: SimpleImputer
+      categorical_strategy:
+        strategy: most_frequent
+        imputer: SimpleImputer
+        fill_value: "Missing"
+
+    test_normality:
+      p_value_threshold: 0.05
+      skewness_threshold: 1.0
+      use_p_value_other_models: false
+
+    handle_outliers:
+      zscore_threshold: 3
+      iqr_multiplier: 1.5
+      apply_zscore: true
+      apply_iqr: true
+      apply_winsor: false
+      winsor_limits: [0.05, 0.05]
+      apply_isolation_forest: false
+      contamination: 0.05
+
+    choose_transformations:
+      method: power
+      power_method: yeo-johnson
+      skewness_threshold: 1.0
+
+    encode_categoricals:
+      ordinal_encoding: OrdinalEncoder
+      nominal_encoding: OneHotEncoder
+      handle_unknown: ignore
+
+    apply_scaling:
+      method: StandardScaler
+      # Features refer to 'numericals' defined above
+
+    implement_smote:
+      variant: null
+      params: {}
+
+    inverse_transformations:
+      inverse_scaling: true
+      inverse_transformation: true
+      inverse_encoding: true
+
+    # Debug flags for each step
+    debug_split_dataset: true
+    debug_handle_missing_values: true
+    debug_test_normality: true
+    debug_handle_outliers: true
+    debug_choose_transformations: true
+    debug_encode_categoricals: true
+    debug_apply_scaling: true
+    debug_implement_smote: false
+    debug_final_inverse_transformations: true
+    debug_validate_inverse_transformations: true
+    debug_generate_recommendations: true
+
+  # -----------------------------------------------------------
+  # 5. Tree Based Regressor (Regression)
+  # -----------------------------------------------------------
+  "Tree Based Regressor":
+    split_dataset:
+      test_size: 0.2
+      random_state: 42
+      stratify_for_classification: false
+
+    handle_missing_values:
+      numerical_strategy:
+        strategy: median
+        imputer: SimpleImputer
+      categorical_strategy:
+        strategy: most_frequent
+        imputer: SimpleImputer
+        fill_value: "Missing"
+
+    test_normality:
+      p_value_threshold: 0.05
+      skewness_threshold: 1.0
+      use_p_value_other_models: false
+
+    handle_outliers:
+      zscore_threshold: 3
+      iqr_multiplier: 1.5
+      apply_zscore: false
+      apply_iqr: true
+      apply_winsor: false
+      winsor_limits: [0.05, 0.05]
+      apply_isolation_forest: false
+      contamination: 0.05
+
+    choose_transformations:
+      method: none
+      skewness_threshold: 1.0
+      # power_method is not applicable when method is 'none'
+
+    encode_categoricals:
+      ordinal_encoding: OrdinalEncoder
+      nominal_encoding: OneHotEncoder
+      handle_unknown: ignore
+
+    apply_scaling:
+      method: none
+      # Features refer to 'numericals' defined above
+
+    implement_smote:
+      variant: null
+      params: {}
+
+    inverse_transformations:
+      inverse_scaling: true
+      inverse_transformation: true
+      inverse_encoding: true
+
+    # Debug flags for each step
+    debug_split_dataset: true
+    debug_handle_missing_values: true
+    debug_test_normality: true
+    debug_handle_outliers: true
+    debug_choose_transformations: true
+    debug_encode_categoricals: true
+    debug_apply_scaling: true
+    debug_implement_smote: false
+    debug_final_inverse_transformations: true
+    debug_validate_inverse_transformations: true
+    debug_generate_recommendations: true
+
+  # -----------------------------------------------------------
+  # 6. Support Vector Machine (Classification)
+  # -----------------------------------------------------------
+  "Support Vector Machine":
+    split_dataset:
+      test_size: 0.2
+      random_state: 42
+      stratify_for_classification: true
+
+    handle_missing_values:
+      numerical_strategy:
+        strategy: mean
+        imputer: KNNImputer
+        knn_neighbors: 5
+      categorical_strategy:
+        strategy: constant
+        imputer: SimpleImputer
+        fill_value: "Unknown"
+
+    test_normality:
+      p_value_threshold: 0.05
+      skewness_threshold: 1.0
+      use_p_value_other_models: false
+
+    handle_outliers:
+      zscore_threshold: 3
+      iqr_multiplier: 1.5
+      apply_zscore: false
+      apply_iqr: true
+      apply_winsor: false
+      winsor_limits: [0.05, 0.05]
+      apply_isolation_forest: false
+      contamination: 0.05
+
+    choose_transformations:
+      method: power
+      power_method: yeo-johnson
+      skewness_threshold: 1.0
+
+    encode_categoricals:
+      ordinal_encoding: OrdinalEncoder
+      nominal_encoding: OneHotEncoder
+      handle_unknown: ignore
+
+    apply_scaling:
+      method: StandardScaler
+      # Features refer to 'numericals' defined above
+
+    implement_smote:
+      variant: SMOTENC
+      params:
+        k_neighbors: 5
+        sampling_strategy: 'auto'
+
+    inverse_transformations:
+      inverse_scaling: true
+      inverse_transformation: true
+      inverse_encoding: true
+
+    # Debug flags for each step
+    debug_split_dataset: true
+    debug_handle_missing_values: true
+    debug_test_normality: true
+    debug_handle_outliers: true
+    debug_choose_transformations: true
+    debug_encode_categoricals: true
+    debug_apply_scaling: true
+    debug_implement_smote: true
+    debug_final_inverse_transformations: true
+    debug_validate_inverse_transformations: true
+    debug_generate_recommendations: true

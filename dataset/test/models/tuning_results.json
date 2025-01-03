@@ -1,24 +1,62 @@
 {
     "XGBoost": {
         "Best Params": {
-            "colsample_bytree": 0.5117319669372997,
+            "colsample_bytree": 1.0,
             "gamma": 0.0,
-            "learning_rate": 0.0321849510637896,
-            "max_depth": 3,
+            "learning_rate": 0.01,
+            "max_depth": 15,
             "min_child_weight": 1,
-            "n_estimators": 500,
+            "n_estimators": 421,
             "reg_alpha": 1.0,
-            "reg_lambda": 1.0,
-            "subsample": 0.8541148278142439
+            "reg_lambda": 1e-08,
+            "subsample": 0.8351779293090407
         },
-        "Best CV Score": -0.48323462279926305,
+        "Best CV Score": -0.4809566637180211,
         "Evaluation Metrics": {
-            "accuracy": 0.76,
-            "precision": 0.76,
-            "recall": 0.76,
-            "f1_score": 0.76,
-            "roc_auc": 0.6587301587301587,
-            "log_loss": 0.6711150121950691
+            "accuracy": 0.72,
+            "precision": 0.7329411764705881,
+            "recall": 0.72,
+            "f1_score": 0.7253333333333333,
+            "roc_auc": 0.7063492063492064,
+            "log_loss": 0.5884453100691451
+        }
+    },
+    "Random Forest": {
+        "Best Params": {
+            "bootstrap": true,
+            "criterion": "gini",
+            "max_depth": 50,
+            "max_features": "log2",
+            "min_samples_leaf": 1,
+            "min_samples_split": 2,
+            "n_estimators": 10
+        },
+        "Best CV Score": -0.47375842858482853,
+        "Evaluation Metrics": {
+            "accuracy": 0.72,
+            "precision": 0.7329411764705881,
+            "recall": 0.72,
+            "f1_score": 0.7253333333333333,
+            "roc_auc": 0.7182539682539683,
+            "log_loss": 1.891565604167116
+        }
+    },
+    "Decision Tree": {
+        "Best Params": {
+            "criterion": "entropy",
+            "max_depth": 3,
+            "min_samples_leaf": 8,
+            "min_samples_split": 20,
+            "splitter": "random"
+        },
+        "Best CV Score": -0.6167987475602181,
+        "Evaluation Metrics": {
+            "accuracy": 0.56,
+            "precision": 0.612,
+            "recall": 0.56,
+            "f1_score": 0.5788235294117647,
+            "roc_auc": 0.4563492063492064,
+            "log_loss": 0.8345673551170053
         }
     }
 }

@@ -1,0 +1,30 @@
+name: data_science_ml
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - numpy=1.23.5
+  - pandas
+  - scikit-learn=1.2.2
+  - matplotlib
+  - seaborn
+  - jupyter
+  - ipykernel
+  - pytest
+  - black
+  - flake8
+  - mypy
+  - scikit-optimize
+  - imbalanced-learn
+  - xgboost
+  - catboost
+  - lightgbm
+  - pip
+  - shap
+  - fastapi
+  - uvicorn
+  - pyyaml
+  - pip:
+    - pretty_errors 
+    - gdown

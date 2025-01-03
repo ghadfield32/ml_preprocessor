@@ -15,7 +15,7 @@ model_types:
 
 features:
   ordinal_categoricals: []
-  nominal_categoricals: ['player_estimated_hand_length_cm_category']
+  nominal_categoricals: []
   numericals:
     - release_ball_direction_x
     - release_ball_direction_z
@@ -36,40 +36,39 @@ features:
 
 execution:
   shared:
-    config_path: '../../ml-preprocessing-utils/data/dataset/test/preprocessor_config/preprocessor_config.yaml'
-    features_metadata_path: '../../ml-preprocessing-utils/data/dataset/test/features_info/features_metadata.pkl'
-    plot_output_dir: '../../ml-preprocessing-utils/data/dataset/test/plots'
-    dataset_output_dir: '../../ml-preprocessing-utils/data/dataset/test/data'
-    # Inherit normalization settings from shared unless overridden
+    config_path: '../../dataset/test/preprocessor_config/preprocessor_config.yaml'
+    features_metadata_path: '../../dataset/test/features_info/features_metadata.pkl'
+    plot_output_dir: '../../dataset/test/plots'
+    dataset_output_dir: '../../dataset/test/data'
     normalize_debug: false
     normalize_graphs_output: false
 
   train:
     mode: train
-    input_path: '../../ml-preprocessing-utils/data/dataset/test/data/final_ml_dataset.csv'
-    output_dir: '../../ml-preprocessing-utils/data/dataset/test/processed_data'
-    training_output_dir: '../../ml-preprocessing-utils/data/dataset/test/training_output'
-    save_transformers_path: '../../ml-preprocessing-utils/data/dataset/test/transformers/'  # Changed to directory
-    model_save_path: '../../ml-preprocessing-utils/data/dataset/test/models'  # New entry
-    normalize_debug: false  # Override if needed
-    normalize_graphs_output: false  # Override if needed
+    input_path: '../../dataset/test/data/final_ml_dataset.csv'  # Correct dataset path
+    output_dir: '../../dataset/test/processed_data'
+    training_output_dir: '../../dataset/test/training_output'
+    save_transformers_path: '../../dataset/test/transformers/'  # Ensure this is a directory
+    model_save_path: '../../dataset/test/models'  # Directory to save trained models
+    normalize_debug: false
+    normalize_graphs_output: false
 
   predict:
     mode: predict
-    load_transformers_path: '../../ml-preprocessing-utils/data/dataset/test/transformers/'  # Changed to directory
-    prediction_input_path: '../../ml-preprocessing-utils/data/dataset/test/data/final_ml_dataset.csv'
-    trained_model_path: '../../ml-preprocessing-utils/data/dataset/test/models/XGBoost_model.pkl'  # Updated path
-    predictions_output_path: '../../ml-preprocessing-utils/data/dataset/test/data'
-    normalize_debug: true  # Override if needed
-    normalize_graphs_output: false  # Override if needed
+    load_transformers_path: '../../dataset/test/transformers/'  # Directory containing transformers.pkl
+    prediction_input_path: '../../dataset/test/data/final_ml_dataset.csv'  # Use appropriate prediction dataset
+    trained_model_path: '../../dataset/test/models/XGBoost_model.pkl'  # Path to the trained model
+    predictions_output_path: '../../dataset/test/data'  # Directory to save predictions
+    normalize_debug: true
+    normalize_graphs_output: false
 
   clustering:
     mode: clustering
-    clustering_input_path: '../../ml-preprocessing-utils/data/dataset/test/data/final_ml_dataset.csv'  # Path to clustering data
-    clustering_output_dir: '../../ml-preprocessing-utils/data/dataset/test/clustering_output'  # Path to save clustering results
-    normalize_debug: false  # Override if needed
-    normalize_graphs_output: false  # Override if needed
-    save_transformers_path: '../../ml-preprocessing-utils/data/dataset/test/transformers/'  # Changed to directory
+    clustering_input_path: '../../dataset/test/data/final_ml_dataset.csv'  # Use appropriate clustering dataset
+    clustering_output_dir: '../../dataset/test/clustering_output'  # Directory to save clustering results
+    normalize_debug: false
+    normalize_graphs_output: false
+    save_transformers_path: '../../dataset/test/transformers/'  # Ensure this is a directory
 
 
 models:

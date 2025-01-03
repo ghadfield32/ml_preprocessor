@@ -1,0 +1,49 @@
+{
+    "name": "data_science_ml",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": "..",
+        "args": {
+            "ENV_NAME": "data_science_ml",
+            "PYTHON_VER": "${localEnv:PYTHON_VER:3.10}",
+            "QUARTO_VER": "${localEnv:QUARTO_VER:1.3.450}"
+        }
+    },
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "python.defaultInterpreterPath": "/opt/conda/envs/data_science_ml/bin/python",
+                "python.pythonPath": "/opt/conda/envs/data_science_ml/bin/python",
+                "terminal.integrated.profiles.linux": {
+                    "bash": {
+                        "path": "bash",
+                        "args": ["-l"]
+                    }
+                },
+                "terminal.integrated.defaultProfile.linux": "bash"
+            },
+            "extensions": [
+                "quarto.quarto",
+                "purocean.drawio-preview",
+                "redhat.vscode-yaml",
+                "yzhang.markdown-all-in-one",
+                "ms-azuretools.vscode-docker",
+                "ms-vscode-remote.remote-containers",
+                "ms-python.python",
+                "ms-toolsai.jupyter",
+                "github.vscode-github-actions"
+            ]
+        }
+    },
+    "mounts": [
+        "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
+    ],
+    "remoteEnv": {
+        "MY_VAR": "${localEnv:MY_VAR:test_var}"
+    },
+    "runArgs": [
+        "--gpus", "all",
+        "--env-file", ".devcontainer/devcontainer.env"
+    ],
+    "postCreateCommand": "conda run -n data_science_ml python /workspace/tests/test1.py"
+}

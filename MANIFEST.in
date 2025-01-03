@@ -1,0 +1,11 @@
+# MANIFEST.in
+
+# Include all YAML configuration files
+recursive-include config *.yaml
+
+# Include any README, LICENSE, and other documentation files
+include README.md
+include LICENSE
+
+# Include package data directories if necessary
+recursive-include datapreprocessor *.py

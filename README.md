@@ -121,7 +121,9 @@ Automate testing to ensure that your package remains functional with every chang
 
 ### **Implementation:**
 
-You've already provided a `.actions/gitactions` file. However, GitHub Actions expects workflow files to be placed in `.github/workflows/`. Let's adjust accordingly.
+## Continuous Integration
+
+The project uses GitHub Actions for CI. The workflow is defined in `.github/workflows/ci.yml`
 
 1. **Move and Rename the Workflow File:**
 

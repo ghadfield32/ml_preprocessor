@@ -1,6 +1,8 @@
 # DataPreprocessor
 
-**DataPreprocessor** is a comprehensive Python package designed to streamline the data preprocessing workflow for various machine learning models. It offers functionalities such as handling missing values, outlier detection, feature encoding, scaling, and addressing class imbalances using techniques like SMOTE.
+**DataPreprocessor** is a comprehensive Python package designed to streamline the data preprocessing workflow for various machine learning models. It offers functionalities such as handling missing values, outlier detection, feature encoding, scaling, and addressing class imbalances using techniques like SMOTE. 
+
+**Datapreprocessor is for after feature engineering/multicollinearity checks/data retrieval, ensure you've done this if appropriate for the model type you are working with**
 
 ## 🧰 Features
 

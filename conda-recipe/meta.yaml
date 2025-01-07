@@ -1,0 +1,36 @@
+# conda-recipe/meta.yaml
+
+package:
+  name: datapreprocessor
+  version: "0.1.0"
+
+source:
+  path: ..
+
+build:
+  number: 0
+  script: python setup.py install
+
+requirements:
+  build:
+    - python
+    - setuptools
+  run:
+    - python
+    - fastapi
+    - uvicorn
+    - pyyaml
+    - pandas
+    - numpy
+    - scikit-learn
+    - imbalanced-learn
+    - matplotlib
+    - seaborn
+    - scipy
+    - joblib
+
+about:
+  home: "https://github.com/ghadfield32-ml_preprocessor"
+  license: MIT
+  summary: "A comprehensive data preprocessing package for machine learning models."
+

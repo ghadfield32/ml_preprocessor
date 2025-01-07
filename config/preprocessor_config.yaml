@@ -36,39 +36,39 @@ features:
 
 execution:
   shared:
-    config_path: '../../dataset/test/preprocessor_config/preprocessor_config.yaml'
-    features_metadata_path: '../../dataset/test/features_info/features_metadata.pkl'
-    plot_output_dir: '../../dataset/test/plots'
-    dataset_output_dir: '../../dataset/test/data'
+    config_path: 'dataset/test/preprocessor_config/preprocessor_config.yaml'
+    features_metadata_path: 'dataset/test/features_info/features_metadata.pkl'
+    plot_output_dir: 'dataset/test/plots'
+    dataset_output_dir: 'dataset/test/data'
     normalize_debug: false
     normalize_graphs_output: false
 
   train:
     mode: train
-    input_path: '../../dataset/test/data/final_ml_dataset.csv'  # Correct dataset path
-    output_dir: '../../dataset/test/processed_data'
-    training_output_dir: '../../dataset/test/training_output'
-    save_transformers_path: '../../dataset/test/transformers/'  # Ensure this is a directory
-    model_save_path: '../../dataset/test/models'  # Directory to save trained models
+    input_path: 'dataset/test/data/final_ml_dataset.csv'  # Correct dataset path
+    output_dir: 'dataset/test/processed_data'
+    training_output_dir: 'dataset/test/training_output'
+    save_transformers_path: 'dataset/test/transformers/'  # Ensure this is a directory
+    model_save_path: 'dataset/test/models'  # Directory to save trained models
     normalize_debug: false
     normalize_graphs_output: false
 
   predict:
     mode: predict
-    load_transformers_path: '../../dataset/test/transformers/'  # Directory containing transformers.pkl
-    prediction_input_path: '../../dataset/test/data/final_ml_dataset.csv'  # Use appropriate prediction dataset
-    trained_model_path: '../../dataset/test/models/XGBoost_model.pkl'  # Path to the trained model
-    predictions_output_path: '../../dataset/test/data'  # Directory to save predictions
+    load_transformers_path: 'dataset/test/transformers/'  # Directory containing transformers.pkl
+    prediction_input_path: 'dataset/test/data/final_ml_dataset.csv'  # Use appropriate prediction dataset
+    trained_model_path: 'dataset/test/models/XGBoost_model.pkl'  # Path to the trained model
+    predictions_output_path: 'dataset/test/data'  # Directory to save predictions
     normalize_debug: true
     normalize_graphs_output: false
 
   clustering:
     mode: clustering
-    clustering_input_path: '../../dataset/test/data/final_ml_dataset.csv'  # Use appropriate clustering dataset
-    clustering_output_dir: '../../dataset/test/clustering_output'  # Directory to save clustering results
+    clustering_input_path: 'dataset/test/data/final_ml_dataset.csv'  # Use appropriate clustering dataset
+    clustering_output_dir: 'dataset/test/clustering_output'  # Directory to save clustering results
     normalize_debug: false
     normalize_graphs_output: false
-    save_transformers_path: '../../dataset/test/transformers/'  # Ensure this is a directory
+    save_transformers_path: 'dataset/test/transformers/'  # Ensure this is a directory
 
 
 models:
@@ -244,9 +244,9 @@ models:
       apply_zscore: true
       apply_iqr: true
       apply_winsor: false
-      winsor_limits: [0.05, 0.05]
-      apply_isolation_forest: false
+      apply_isolation_forest: false  # Because we’re using our custom code to do multivariate ISOForest
       contamination: 0.05
+
 
     choose_transformations:
       method: power

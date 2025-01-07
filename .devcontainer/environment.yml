@@ -1,4 +1,4 @@
-name: data_science_ml
+name: data_science_ml_preprocessor
 channels:
   - conda-forge
   - defaults
@@ -25,6 +25,10 @@ dependencies:
   - fastapi
   - uvicorn
   - pyyaml
+  - conda-build
   - pip:
     - pretty_errors 
     - gdown
+    - pytest-mock
+    - git+https://github.com/ghadfield32/ml_preprocessor # adding in custom preprocessing package
+    

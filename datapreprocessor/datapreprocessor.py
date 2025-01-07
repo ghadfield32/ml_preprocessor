@@ -1,4 +1,4 @@
-# data_preprocessor.py
+# datapreprocessor.py
 
 import pandas as pd
 import numpy as np
@@ -127,7 +127,11 @@ class DataPreprocessor:
         handler.setFormatter(formatter)
         if not self.logger.handlers:
             self.logger.addHandler(handler)
-
+            
+        # Initialize feature_reasons with 'all_numericals' for clustering
+        self.feature_reasons = {col: '' for col in self.ordinal_categoricals + self.nominal_categoricals + self.numericals}
+        if self.model_category == 'clustering':
+            self.feature_reasons['all_numericals'] = ''
 
     def get_debug_flag(self, flag_name: str) -> bool:
         """
@@ -411,23 +415,16 @@ class DataPreprocessor:
 
         debug_flag = self.get_debug_flag('debug_handle_outliers')
         initial_shape = X_train.shape[0]
-        new_columns = []
 
         # Fetch user-defined outlier handling options or set defaults
         outlier_options = self.options.get('handle_outliers', {})
         zscore_threshold = outlier_options.get('zscore_threshold', 3)
         iqr_multiplier = outlier_options.get('iqr_multiplier', 1.5)
-        winsor_limits = outlier_options.get('winsor_limits', [0.05, 0.05])
         isolation_contamination = outlier_options.get('isolation_contamination', 0.05)
 
-        # Check for target leakage: Ensure y_train is not used in transformations
-        if self.mode == 'train' and y_train is not None:
-            self._log("y_train is present. Confirming it's not used in outlier handling.", step_name, 'debug')
-            # Add any specific checks if transformations accidentally use y_train
-            # For example, ensure that no columns derived from y_train are being modified
-
-        for col in self.numericals:
-            if self.model_category in ['regression', 'classification']:
+        if self.model_category in ['regression', 'classification']:
+            self.logger.info(f"Applying univariate outlier detection for {self.model_category}.")
+            for col in self.numericals:
                 # Z-Score Filtering
                 apply_zscore = outlier_options.get('apply_zscore', True)
                 if apply_zscore:
@@ -438,7 +435,7 @@ class DataPreprocessor:
                     if y_train is not None:
                         y_train = y_train.loc[X_train.index]
                     self.feature_reasons[col] += f'Outliers handled with Z-Score Filtering (threshold={zscore_threshold}) | '
-                    self._log(f"Removed {removed_z} outliers from '{col}' using Z-Score Filtering", step_name, 'debug')
+                    self._log(f"Removed {removed_z} outliers from '{col}' using Z-Score Filtering.", step_name, 'debug')
 
                 # IQR Filtering
                 apply_iqr = outlier_options.get('apply_iqr', True)
@@ -454,30 +451,33 @@ class DataPreprocessor:
                     if y_train is not None:
                         y_train = y_train.loc[X_train.index]
                     self.feature_reasons[col] += f'Outliers handled with IQR Filtering (multiplier={iqr_multiplier}) | '
-                    self._log(f"Removed {removed_iqr} outliers from '{col}' using IQR Filtering", step_name, 'debug')
+                    self._log(f"Removed {removed_iqr} outliers from '{col}' using IQR Filtering.", step_name, 'debug')
 
-            elif self.model_category == 'clustering':
-                # For clustering, apply IsolationForest for outlier detection
-                contamination = outlier_options.get('isolation_contamination', 0.05)
-                iso_forest = IsolationForest(contamination=contamination, random_state=42)
-                preds = iso_forest.fit_predict(X_train[[col]])
-                mask_iso = preds != -1
-                removed_iso = (preds == -1).sum()
-                X_train = X_train[mask_iso]
-                self.feature_reasons[col] += f'Outliers handled with IsolationForest (contamination={contamination}) | '
-                self._log(f"Removed {removed_iso} outliers from '{col}' using IsolationForest", step_name, 'debug')
+        elif self.model_category == 'clustering':
+            self.logger.info("Applying multivariate IsolationForest for clustering.")
+            # Apply IsolationForest on all numerical features simultaneously
+            contamination = isolation_contamination
+            iso_forest = IsolationForest(contamination=contamination, random_state=42)
+            preds = iso_forest.fit_predict(X_train[self.numericals])
+            mask_iso = preds != -1
+            removed_iso = (preds == -1).sum()
+            X_train = X_train[mask_iso]
+            if y_train is not None:
+                y_train = y_train.loc[X_train.index]  # Should typically be None in clustering
+            self.feature_reasons['all_numericals'] += f'Outliers handled with Multivariate IsolationForest (contamination={contamination}) | '
+            self._log(f"Removed {removed_iso} outliers using Multivariate IsolationForest.", step_name, 'debug')
 
-            else:
-                self.logger.warning(f"Model category '{self.model_category}' not recognized for outlier handling.")
+        else:
+            self.logger.warning(f"Model category '{self.model_category}' not recognized for outlier handling.")
 
         self.preprocessing_steps.append("Handle Outliers")
 
         # Completion Logging
         self._log(f"Completed: Handle Outliers. Initial samples: {initial_shape}, Final samples: {X_train.shape[0]}", step_name, 'debug')
         self._log(f"Missing values after outlier handling in X_train:\n{X_train.isnull().sum()}", step_name, 'debug')
-        self._log(f"Outlier handling applied on columns: {new_columns}", step_name, 'debug')
 
         return X_train, y_train
+
 
     def test_normality(self, X_train: pd.DataFrame) -> Dict[str, Dict]:
         """
@@ -890,9 +890,28 @@ class DataPreprocessor:
 
         return X_train, X_test
 
+
+    def determine_n_neighbors(self, minority_count: int, default_neighbors: int = 5) -> int:
+        """
+        Determine the appropriate number of neighbors for SMOTE based on minority class size.
+
+        Args:
+            minority_count (int): Number of samples in the minority class.
+            default_neighbors (int): Default number of neighbors to use if possible.
+
+        Returns:
+            int: Determined number of neighbors for SMOTE.
+        """
+        if minority_count <= 1:
+            raise ValueError("SMOTE cannot be applied when the minority class has less than 2 samples.")
+        
+        # Ensure n_neighbors does not exceed minority_count - 1
+        n_neighbors = min(default_neighbors, minority_count - 1)
+        return n_neighbors
+
     def implement_smote(self, X_train: pd.DataFrame, y_train: pd.Series) -> Tuple[pd.DataFrame, pd.Series]:
         """
-        Implement SMOTE or its variants based on class imbalance.
+        Implement SMOTE or its variants based on class imbalance with automated n_neighbors selection.
 
         Args:
             X_train (pd.DataFrame): Training features (transformed).
@@ -944,26 +963,36 @@ class DataPreprocessor:
             self.logger.info("Feature composition unclear. Using SMOTE as default.")
 
         # Initialize SMOTE based on the variant
-        if smote_variant == 'SMOTENC':
-            if not self.categorical_indices:
-                # Determine categorical indices if not already set
-                categorical_features = []
-                for name, transformer, features in self.pipeline.transformers_:
-                    if 'ord' in name or 'nominal' in name:
-                        if isinstance(transformer, Pipeline):
-                            encoder = transformer.named_steps.get('ordinal_encoder') or transformer.named_steps.get('onehot_encoder')
-                            if hasattr(encoder, 'categories_'):
-                                categorical_features.extend(range(len(encoder.categories_)))
-                self.categorical_indices = categorical_features
-                self.logger.debug(f"Categorical feature indices for SMOTENC: {self.categorical_indices}")
-            smote = SMOTENC(categorical_features=self.categorical_indices, random_state=42)
-            self.logger.debug(f"Initialized SMOTENC with categorical features indices: {self.categorical_indices}")
-        elif smote_variant == 'SMOTEN':
-            smote = SMOTEN(random_state=42)
-            self.logger.debug("Initialized SMOTEN.")
-        else:
-            smote = SMOTE(random_state=42)
-            self.logger.debug("Initialized SMOTE.")
+        try:
+            if smote_variant == 'SMOTENC':
+                if not self.categorical_indices:
+                    # Determine categorical indices if not already set
+                    categorical_features = []
+                    for name, transformer, features in self.pipeline.transformers_:
+                        if 'ord' in name or 'nominal' in name:
+                            if isinstance(transformer, Pipeline):
+                                encoder = transformer.named_steps.get('ordinal_encoder') or transformer.named_steps.get('onehot_encoder')
+                                if hasattr(encoder, 'categories_'):
+                                    categorical_features.extend(range(len(encoder.categories_)))
+                    self.categorical_indices = categorical_features
+                    self.logger.debug(f"Categorical feature indices for SMOTENC: {self.categorical_indices}")
+                n_neighbors = self.determine_n_neighbors(minority_count, default_neighbors=5)
+                smote = SMOTENC(categorical_features=self.categorical_indices, random_state=42, k_neighbors=n_neighbors)
+                self.logger.debug(f"Initialized SMOTENC with categorical features indices: {self.categorical_indices} and n_neighbors={n_neighbors}")
+            elif smote_variant == 'SMOTEN':
+                n_neighbors = self.determine_n_neighbors(minority_count, default_neighbors=5)
+                smote = SMOTEN(random_state=42, n_neighbors=n_neighbors)
+                self.logger.debug(f"Initialized SMOTEN with n_neighbors={n_neighbors}")
+            else:
+                n_neighbors = self.determine_n_neighbors(minority_count, default_neighbors=5)
+                smote = SMOTE(random_state=42, k_neighbors=n_neighbors)
+                self.logger.debug(f"Initialized SMOTE with n_neighbors={n_neighbors}")
+        except ValueError as ve:
+            self.logger.error(f"❌ SMOTE initialization failed: {ve}")
+            raise
+        except Exception as e:
+            self.logger.error(f"❌ Unexpected error during SMOTE initialization: {e}")
+            raise
 
         # Apply SMOTE
         try:
@@ -971,10 +1000,12 @@ class DataPreprocessor:
             self.logger.info(f"Applied {smote_variant}. Resampled dataset shape: {X_resampled.shape}")
             self.preprocessing_steps.append("Implement SMOTE")
             self.smote = smote  # Assign to self for saving
+            self.logger.debug(f"Selected n_neighbors for SMOTE: {n_neighbors}")
             return X_resampled, y_resampled
         except Exception as e:
             self.logger.error(f"❌ SMOTE application failed: {e}")
             raise
+
 
     def inverse_transform_data(self, X_transformed: np.ndarray) -> pd.DataFrame:
         """
@@ -1180,6 +1211,7 @@ class DataPreprocessor:
                 self.logger.debug(f"Categorical feature indices for SMOTENC: {self.categorical_indices}")
 
         return preprocessor
+
 
     def preprocess_train(self, X: pd.DataFrame, y: pd.Series) -> Tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series, pd.DataFrame, Optional[pd.DataFrame]]:
         # Step 1: Split Dataset
@@ -1482,3 +1514,8 @@ class DataPreprocessor:
         for col in df.columns:
             self.logger.debug(f"Column '{col}': {df[col].dtype}, Unique Values: {df[col].nunique()}")
         self.logger.debug("\n")
+
+
+    
+
+

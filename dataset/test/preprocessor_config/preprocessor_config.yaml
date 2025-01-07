@@ -244,9 +244,9 @@ models:
       apply_zscore: true
       apply_iqr: true
       apply_winsor: false
-      winsor_limits: [0.05, 0.05]
-      apply_isolation_forest: false
+      apply_isolation_forest: false  # Because we’re using our custom code to do multivariate ISOForest
       contamination: 0.05
+
 
     choose_transformations:
       method: power

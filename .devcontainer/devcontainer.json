@@ -1,10 +1,10 @@
 {
-    "name": "data_science_ml",
+    "name": "data_science_ml_preprocessor",
     "build": {
         "dockerfile": "Dockerfile",
         "context": "..",
         "args": {
-            "ENV_NAME": "data_science_ml",
+            "ENV_NAME": "data_science_ml_preprocessor",
             "PYTHON_VER": "${localEnv:PYTHON_VER:3.10}",
             "QUARTO_VER": "${localEnv:QUARTO_VER:1.3.450}"
         }
@@ -12,8 +12,8 @@
     "customizations": {
         "vscode": {
             "settings": {
-                "python.defaultInterpreterPath": "/opt/conda/envs/data_science_ml/bin/python",
-                "python.pythonPath": "/opt/conda/envs/data_science_ml/bin/python",
+                "python.defaultInterpreterPath": "/opt/conda/envs/data_science_ml_preprocessor/bin/python",
+                "python.pythonPath": "/opt/conda/envs/data_science_ml_preprocessor/bin/python",
                 "terminal.integrated.profiles.linux": {
                     "bash": {
                         "path": "bash",
@@ -45,5 +45,5 @@
         "--gpus", "all",
         "--env-file", ".devcontainer/devcontainer.env"
     ],
-    "postCreateCommand": "conda run -n data_science_ml python /workspace/tests/test1.py"
+    "postCreateCommand": "conda run -n data_science_ml_preprocessor python /workspace/tests/test1.py"
 }

@@ -4,11 +4,11 @@
 
 ## 🧰 Features
 
-- **Flexible Preprocessing Pipeline:** Customize preprocessing steps based on your model requirements.
+- **Flexible Preprocessing Pipeline:** Customize preprocessing steps based on your model type and mode, default path for most Regressive/Classifier/Clustering models that can be adjusted
 - **Automatic Outlier Detection:** Utilize methods like Z-Score Filtering, IQR Filtering, and Isolation Forest.
 - **Categorical Encoding:** Support for Ordinal and One-Hot Encoding.
 - **Scaling Options:** Apply StandardScaler, MinMaxScaler, or RobustScaler.
-- **Class Imbalance Handling:** Implement SMOTE and its variants for classification tasks.
+- **Class Imbalance Handling:** Automated SMOTE/SMOTENC/SMOTEN handling. We have numerical + categorical datasets have SMOTENC applied, Categorical only has SMOTEN, and Numerical only goes through a criteria to use SMOTE/BorderlineSmote/ADSYN/SMOTEENN/SMOTETomek (these are optional also if you wanted to try a different one if you have a Numerical ONLY dataset)
 - **Configuration Driven:** Easily adjust preprocessing steps via YAML configuration files.
 - **Inverse Transformation:** Reconstruct original feature values from transformed data for interpretability.
 

@@ -1,21 +1,35 @@
 # preprocessor_config.yaml
 
-current_model: "Tree Based Classifier"  # Change as needed
-
-# preprocessor_config.yaml
-
-# Add a new key at the root level
+# Root-level keys
 model_types:
-  - "Tree Based Classifier"
-  - "Logistic Regression"
-  - "K-Means"
-  - "Linear Regression"
+  # - "Tree Based Classifier"
+  # - "Logistic Regression"
+  # - "K-Means"
+  # - "Linear Regression"
   - "Tree Based Regressor"
-  - "Support Vector Machine"
+  # - "Support Vector Machine"
+
+model_sub_types:
+  # Tree Based Classifier:
+  #   - "Random Forest"
+  #   - "XGBoost"
+  #   - "Decision Tree"
+  # Logistic Regression:
+  #   - "Logistic Regression"
+  # K-Means:
+  #   - "K-Means"
+  # Linear Regression:
+  #   - "Linear Regression"
+  Tree Based Regressor:
+    - "Random Forest Regressor"
+    - "XGBoost Regressor"
+    - "Decision Tree Regressor"
+  # Support Vector Machine:
+  #   - "Support Vector Machine"
 
 features:
   ordinal_categoricals: []
-  nominal_categoricals: []
+  nominal_categoricals: ['player_estimated_hand_length_cm_category']
   numericals:
     - release_ball_direction_x
     - release_ball_direction_z
@@ -34,49 +48,27 @@ features:
   y_variable:
     - result
 
-execution:
-  shared:
-    config_path: '../../dataset/test/preprocessor_config/preprocessor_config.yaml'
-    features_metadata_path: '../../dataset/test/features_info/features_metadata.pkl'
-    plot_output_dir: '../../dataset/test/plots'
-    dataset_output_dir: '../../dataset/test/data'
-    normalize_debug: false
-    normalize_graphs_output: false
 
-  train:
-    mode: train
-    input_path: '../../dataset/test/data/final_ml_dataset.csv'  # Correct dataset path
-    output_dir: '../../dataset/test/processed_data'
-    training_output_dir: '../../dataset/test/training_output'
-    save_transformers_path: '../../dataset/test/transformers/'  # Ensure this is a directory
-    model_save_path: '../../dataset/test/models'  # Directory to save trained models
-    normalize_debug: false
-    normalize_graphs_output: false
-
-  predict:
-    mode: predict
-    load_transformers_path: '../../dataset/test/transformers/'  # Directory containing transformers.pkl
-    prediction_input_path: '../../dataset/test/data/final_ml_dataset.csv'  # Use appropriate prediction dataset
-    trained_model_path: '../../dataset/test/models/XGBoost_model.pkl'  # Path to the trained model
-    predictions_output_path: '../../dataset/test/data'  # Directory to save predictions
-    normalize_debug: true
-    normalize_graphs_output: false
-
-  clustering:
-    mode: clustering
-    clustering_input_path: '../../dataset/test/data/final_ml_dataset.csv'  # Use appropriate clustering dataset
-    clustering_output_dir: '../../dataset/test/clustering_output'  # Directory to save clustering results
-    normalize_debug: false
-    normalize_graphs_output: false
-    save_transformers_path: '../../dataset/test/transformers/'  # Ensure this is a directory
-
+paths:
+  # Base directories
+  base_data_dir: "../../dataset/test/data"
+  raw_data_file: "final_ml_dataset.csv"
+  processed_data_dir: "preprocessor/processed"
+  features_metadata_file: "features_info/features_metadata.pkl"
+  predictions_output_dir: "preprocessor/predictions"
+  config_file: "../../dataset/test/preprocessor_config/preprocessor_config.yaml"
+  
+  # Output directories
+  log_dir: "../preprocessor/logs"
+  model_save_base_dir: "../preprocessor/models"
+  transformers_save_base_dir: "../preprocessor/transformers"
+  plots_output_dir: "../preprocessor/plots"
+  training_output_dir: "../preprocessor/training_output"
 
 models:
-
-  # -----------------------------------------------------------
-  # 1. Tree Based Classifier (Classification)
-  # -----------------------------------------------------------
-  "Tree Based Classifier":
+  # Configuration for each model type
+  Tree Based Classifier:
+    # Shared preprocessing steps for all tree-based classifiers
     split_dataset:
       test_size: 0.2
       random_state: 42

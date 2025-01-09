@@ -3,324 +3,265 @@
 import pytest
 import pandas as pd
 import numpy as np
-from datapreprocessor import DataPreprocessor
-from pathlib import Path
-
-# Define the root directory for the project
-ROOT_DIR = Path(__file__).resolve().parent.parent
-
-# ------------------------
-# Load in the real dataset we have and config we used, manipulate the dataset to create sample data
-# ------------------------
-
-# tests/test_datapreprocessor.py
-
-import pytest
-import pandas as pd
-import numpy as np
 import yaml
 from datapreprocessor import DataPreprocessor
 from pathlib import Path
 import os
+from sklearn.dummy import DummyClassifier, DummyRegressor
+from sklearn.svm import SVC, SVR
+from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
+from sklearn.linear_model import LogisticRegression, LinearRegression
+from sklearn.cluster import KMeans
+import joblib
+
+def construct_model_path(model_save_base_dir: Path, model_sub_type: str) -> Path:
+    """Constructs a standardized path for saving/loading models, matching example usage."""
+    model_dir = model_save_base_dir / model_sub_type.replace(" ", "_")
+    model_dir.mkdir(parents=True, exist_ok=True)
+    model_path = model_dir / 'trained_model.pkl'
+    return model_path
+
+def construct_predictions_path(predictions_output_dir: Path, model_sub_type: str) -> Path:
+    """Constructs a standardized path for saving predictions, matching example usage."""
+    predictions_dir = predictions_output_dir / model_sub_type.replace(" ", "_")
+    predictions_dir.mkdir(parents=True, exist_ok=True)
+    predictions_file = predictions_dir / f'predictions_{model_sub_type.replace(" ", "_")}.csv'
+    return predictions_file
+
+def get_dummy_model(model_type: str):
+    """Returns a dummy model based on the model_type."""
+    if "Classifier" in model_type:
+        return DummyClassifier(strategy="most_frequent")
+    elif "Regressor" in model_type:
+        return DummyRegressor(strategy="mean")
+    elif "Support Vector Machine" in model_type:
+        return SVC(probability=True)
+    elif "K-Means" in model_type:
+        return KMeans(n_clusters=3, random_state=42)
+    else:
+        return DummyClassifier()
 
 @pytest.fixture(scope="session")
 def config():
-    """Fixture to load the preprocessor configuration from YAML."""
-    config_path = 'config/preprocessor_config.yaml'
+    """
+    Fixture to load the preprocessor configuration from YAML.
+    Adjust the path to where your 'preprocessor_config.yaml' lives.
+    This matches how the example usage loads config in 'train_predict.py'.
+    """
+    # Example path adjustment:
+    config_path = Path(__file__).resolve().parent.parent / 'config/preprocessor_config.yaml'
+    if not config_path.exists():
+        pytest.fail(f"Configuration file not found at path: {config_path}")
     with open(config_path, 'r') as file:
-        config = yaml.safe_load(file)
-    return config
+        loaded_config = yaml.safe_load(file)
+    return loaded_config
 
 @pytest.fixture(scope="session")
 def real_dataset(config):
-    """Fixture to load the real dataset based on the configuration."""
-    input_path = config['execution']['train']['input_path']
-    if not os.path.exists(input_path):
+    """
+    Fixture to load the real dataset based on the updated config structure.
+    Matches how 'train_predict.py' loads it via 'load_dataset' (minus the logging).
+    """
+    base_data_dir = Path(config["paths"]["base_data_dir"])
+    raw_data_file = config["paths"]["raw_data_file"]
+    input_path = base_data_dir / raw_data_file
+    
+    if not input_path.exists():
         pytest.fail(f"Dataset not found at path: {input_path}")
+    
     df = pd.read_csv(input_path)
     return df
 
+@pytest.mark.parametrize("model_type", [
+    "Tree Based Classifier",
+    "Logistic Regression",
+    "K-Means",
+    "Linear Regression",
+    "Tree Based Regressor",
+    "Support Vector Machine"
+])
+def test_datapreprocessor_modes(model_type, config, real_dataset, tmp_path, mocker):
+    """
+    Parameterized test for different model types (and their subtypes).
+    This test now closely mimics the example usage from train_predict.py:
+      - train mode
+      - predict mode
+      - (optionally) clustering mode for K-Means
+    """
 
-# ------------------------
-# Test Cases
-# ------------------------
+    # 1. Gather model subtypes from config
+    model_sub_types = config.get('model_sub_types', {}).get(model_type, [])
+    if not model_sub_types:
+        pytest.skip(f"No subtypes found for model type '{model_type}'. Skipping tests.")
 
-def test_train_mode_tree_based_classifier(config, real_dataset, tmp_path):
-    """Test training mode for Tree Based Classifier using real dataset and config."""
-    
-    # Update paths in configuration to use temporary directories
-    config['execution']['train']['output_dir'] = str(tmp_path / "processed_data")
-    config['execution']['train']['save_transformers_path'] = str(tmp_path / "transformers")
-    config['execution']['train']['model_save_path'] = str(tmp_path / "models")
-    
-    # Initialize DataPreprocessor
-    preprocessor = DataPreprocessor(
-        model_type=config['current_model'],
-        y_variable=config['features']['y_variable'],
-        ordinal_categoricals=config['features']['ordinal_categoricals'],
-        nominal_categoricals=config['features']['nominal_categoricals'],
-        numericals=config['features']['numericals'],
-        mode=config['execution']['train']['mode'],
-        options=config['models'][config['current_model']],
-        debug=config.get('logging', {}).get('debug', False)
-    )
-    
-    # Execute Preprocessing
-    try:
-        X_train, X_test, y_train, y_test, recommendations, X_test_inverse = preprocessor.final_preprocessing(real_dataset)
-    except Exception as e:
-        pytest.fail(f"Preprocessing raised an exception: {e}")
-    
-    # Assertions for returned objects
-    assert X_train is not None, "X_train is None"
-    assert X_test is not None, "X_test is None"
-    assert y_train is not None, "y_train is None"
-    assert y_test is not None, "y_test is None"
-    assert isinstance(recommendations, pd.DataFrame), "recommendations is not a DataFrame"
-    assert X_test_inverse is not None, "X_test_inverse is None"
-    
-    # Manually save the DataFrames to CSV files
-    processed_data_dir = Path(config['execution']['train']['output_dir']) / "Tree_Based_Classifier"
-    processed_data_dir.mkdir(parents=True, exist_ok=True)  # Ensure the directory exists
-    
-    # Save each DataFrame to its respective CSV file
-    X_train.to_csv(processed_data_dir / "X_train.csv", index=False)
-    y_train.to_csv(processed_data_dir / "y_train.csv", index=False)
-    X_test.to_csv(processed_data_dir / "X_test.csv", index=False)
-    y_test.to_csv(processed_data_dir / "y_test.csv", index=False)
-    recommendations.to_csv(processed_data_dir / "preprocessing_recommendations.csv", index=False)
-    
-    # Now perform the assertions to check if files exist
-    assert (processed_data_dir / "X_train.csv").exists(), "X_train.csv not found"
-    assert (processed_data_dir / "y_train.csv").exists(), "y_train.csv not found"
-    assert (processed_data_dir / "X_test.csv").exists(), "X_test.csv not found"
-    assert (processed_data_dir / "y_test.csv").exists(), "y_test.csv not found"
-    assert (processed_data_dir / "preprocessing_recommendations.csv").exists(), "preprocessing_recommendations.csv not found"
+    # 2. Loop through each subtype
+    for model_sub_type in model_sub_types:
+        
+        # Grab the model-specific config (like handle_missing_values, etc.)
+        model_config = config.get('models', {}).get(model_type, {})
+        if not model_config:
+            pytest.fail(f"No configuration found for model type '{model_type}'.")
 
+        # Paths from config (example usage style)
+        model_save_base_dir = tmp_path / "models"
+        predictions_output_dir = tmp_path / "predictions"
+        transformers_dir = tmp_path / "transformers"
 
+        # 3. Handle 'clustering' mode only for K-Means 
+        #    (just like the example usage does)
+        if model_type == "K-Means":
+            # Initialize DataPreprocessor in 'clustering' mode
+            preprocessor_clustering = DataPreprocessor(
+                model_type=model_type,
+                y_variable=None,  # K-Means is unsupervised
+                ordinal_categoricals=config['features'].get('ordinal_categoricals', []),
+                nominal_categoricals=config['features'].get('nominal_categoricals', []),
+                numericals=config['features'].get('numericals', []),
+                mode='clustering',
+                options=model_config,
+                debug=True,
+                normalize_debug=True,
+                normalize_graphs_output=True,
+                graphs_output_dir=tmp_path / "plots",
+                transformers_dir=transformers_dir
+            )
 
-def test_predict_mode_tree_based_classifier(config, real_dataset, tmp_path, mocker):
-    """Test prediction mode for Tree Based Classifier using real dataset and config."""
-    
-    # Update paths in configuration to use temporary directories
-    config['execution']['predict']['predictions_output_path'] = str(tmp_path / "predictions")
-    config['execution']['predict']['load_transformers_path'] = str(tmp_path / "transformers")
-    config['execution']['predict']['trained_model_path'] = str(tmp_path / "models" / "XGBoost_model.pkl")
-    
-    # Ensure the transformers and model directories exist
-    Path(config['execution']['predict']['load_transformers_path']).mkdir(parents=True, exist_ok=True)
-    Path(config['execution']['predict']['trained_model_path']).parent.mkdir(parents=True, exist_ok=True)
-    
-    # Mock the trained model using joblib
-    mock_model = mocker.MagicMock()
-    mock_model.predict.return_value = np.array(['1', '0'])
-    mocker.patch('joblib.load', return_value=mock_model)
-    
-    # Initialize DataPreprocessor
-    preprocessor = DataPreprocessor(
-        model_type=config['current_model'],
-        y_variable=config['features']['y_variable'],
-        ordinal_categoricals=config['features']['ordinal_categoricals'],
-        nominal_categoricals=config['features']['nominal_categoricals'],
-        numericals=config['features']['numericals'],
-        mode=config['execution']['predict']['mode'],
-        options=config['models'][config['current_model']],
-        debug=config.get('logging', {}).get('debug', False)
-    )
-    
-    # Execute Preprocessing for Prediction
-    try:
-        X_preprocessed, recommendations, X_inversed = preprocessor.preprocess_predict(real_dataset)
-    except Exception as e:
-        pytest.fail(f"Preprocessing for prediction raised an exception: {e}")
-    
-    # Assertions
-    assert X_preprocessed is not None, "X_preprocessed is None"
-    assert isinstance(recommendations, pd.DataFrame), "recommendations is not a DataFrame"
-    assert X_inversed is not None, "X_inversed is None"
-    
-    # Make predictions
-    predictions = mock_model.predict(X_preprocessed)
-    y_new_pred = predictions
-    
-    # Attach Predictions to Inversed Data
-    if X_inversed is not None:
-        # Assuming 'predictions' is a new column to be added
-        X_inversed = pd.DataFrame(X_inversed, columns=X_inversed.columns)  # Ensure X_inversed is a DataFrame
-        X_inversed['predictions'] = y_new_pred
-        assert 'predictions' in X_inversed.columns, "'predictions' column not found in X_inversed"
-        assert len(y_new_pred) == len(X_inversed), "Length of predictions does not match X_inversed"
-    
-    # Check if predictions file is saved
-    predictions_dir = Path(config['execution']['predict']['predictions_output_path'])
-    predictions_dir.mkdir(parents=True, exist_ok=True)
-    predictions_file = predictions_dir / 'predictions_Tree_Based_Classifier.csv'
-    # Simulate saving predictions
-    X_inversed.to_csv(predictions_file, index=False)
-    assert predictions_file.exists(), f"Predictions file not found at {predictions_file}"
+            # Call final_preprocessing in clustering mode
+            try:
+                X_processed, recommendations = preprocessor_clustering.final_preprocessing(real_dataset)
+            except Exception as e:
+                pytest.fail(f"Clustering preprocessing failed for {model_sub_type}: {e}")
 
+            # Assertions
+            assert X_processed is not None, "X_processed is None in clustering mode."
+            assert isinstance(recommendations, pd.DataFrame), "Recommendations not a DataFrame in clustering mode."
 
+            # Save the preprocessed data for verification
+            X_processed_df = pd.DataFrame(X_processed, 
+                                          columns=preprocessor_clustering.pipeline.get_feature_names_out())
+            clustering_output_dir = tmp_path / "clustering_output" / model_sub_type.replace(" ", "_")
+            clustering_output_dir.mkdir(parents=True, exist_ok=True)
+            X_processed_df.to_csv(clustering_output_dir / "X_processed.csv", index=False)
+            recommendations.to_csv(clustering_output_dir / "preprocessing_recommendations.csv", index=False)
 
-def test_clustering_mode_kmeans(config, real_dataset, tmp_path, mocker):
-    """Test clustering mode for K-Means using real dataset and config."""
-    
-    # Update paths in configuration to use temporary directories
-    config['execution']['clustering']['clustering_output_dir'] = str(tmp_path / "clustering_output")
-    config['execution']['clustering']['save_transformers_path'] = str(tmp_path / "transformers")
-    
-    # Ensure the transformers directory exists
-    Path(config['execution']['clustering']['save_transformers_path']).mkdir(parents=True, exist_ok=True)
-    
-    # Mock KMeans model if needed
-    # Depending on implementation, you might need to mock parts of DataPreprocessor
-    # For simplicity, assuming KMeans can run without mocking
-    
-    # Initialize DataPreprocessor
-    preprocessor = DataPreprocessor(
-        model_type=config['current_model'],
-        y_variable=config['features']['y_variable'],
-        ordinal_categoricals=config['features']['ordinal_categoricals'],
-        nominal_categoricals=config['features']['nominal_categoricals'],
-        numericals=config['features']['numericals'],
-        mode=config['execution']['clustering']['mode'],
-        options=config['models'][config['current_model']],
-        debug=config.get('logging', {}).get('debug', False)
-    )
-    
-    # Execute Preprocessing for Clustering
-    try:
-        X_processed, recommendations = preprocessor.final_preprocessing(real_dataset)
-    except Exception as e:
-        pytest.fail(f"Preprocessing for clustering raised an exception: {e}")
-    
-    # Assertions
-    assert X_processed is not None, "X_processed is None"
-    assert isinstance(recommendations, pd.DataFrame), "recommendations is not a DataFrame"
-    
-    # Check if clustering model is saved
-    clustering_output_dir = Path(config['execution']['clustering']['clustering_output_dir'])
-    expected_model_path = clustering_output_dir / "K-Means_model.pkl"
-    
-    # Simulate saving clustering model
-    # If the DataPreprocessor saves the model, ensure it exists
-    # Here, assuming DataPreprocessor saves the model, but if it doesn't, mock it
-    if not expected_model_path.exists():
-        # Simulate saving a dummy model for the test
-        expected_model_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(expected_model_path, 'wb') as f:
-            f.write(b"Dummy KMeans model")
-    
-    assert expected_model_path.exists(), f"K-Means_model.pkl not found at {expected_model_path}"
+            # Assertions to Check if Files are Saved
+            assert (clustering_output_dir / "X_processed.csv").exists(), f"X_processed.csv not found for {model_sub_type}"
+            assert (clustering_output_dir / "preprocessing_recommendations.csv").exists(), f"preprocessing_recommendations.csv not found for {model_sub_type}"
 
+            # Done with clustering. Move to the next subtype.
+            continue
 
+        # =============== TRAIN MODE ===============
+        preprocessor_train = DataPreprocessor(
+            model_type=model_type,
+            y_variable=config['features'].get('y_variable', None),
+            ordinal_categoricals=config['features'].get('ordinal_categoricals', []),
+            nominal_categoricals=config['features'].get('nominal_categoricals', []),
+            numericals=config['features'].get('numericals', []),
+            mode='train',
+            options=model_config,
+            debug=True,
+            normalize_debug=True,
+            normalize_graphs_output=True,
+            graphs_output_dir=tmp_path / "plots",
+            transformers_dir=transformers_dir
+        )
 
-def test_train_mode_linear_regression(config, real_dataset, tmp_path):
-    """Test training mode for Linear Regression using real dataset and config."""
-    
-    # Update paths in configuration to use temporary directories
-    config['current_model'] = "Linear Regression"
-    config['execution']['train']['output_dir'] = str(tmp_path / "processed_data")
-    config['execution']['train']['save_transformers_path'] = str(tmp_path / "transformers")
-    config['execution']['train']['model_save_path'] = str(tmp_path / "models")
-    
-    # Initialize DataPreprocessor
-    preprocessor = DataPreprocessor(
-        model_type=config['current_model'],
-        y_variable=config['features']['y_variable'],
-        ordinal_categoricals=config['features']['ordinal_categoricals'],
-        nominal_categoricals=config['features']['nominal_categoricals'],
-        numericals=config['features']['numericals'],
-        mode=config['execution']['train']['mode'],
-        options=config['models'][config['current_model']],
-        debug=config.get('logging', {}).get('debug', False)
-    )
-    
-    # Execute Preprocessing
-    try:
-        X_train, X_test, y_train, y_test, recommendations, X_test_inverse = preprocessor.final_preprocessing(real_dataset)
-    except Exception as e:
-        pytest.fail(f"Preprocessing raised an exception: {e}")
-    
-    # Assertions for returned objects
-    assert X_train is not None, "X_train is None"
-    assert X_test is not None, "X_test is None"
-    assert y_train is not None, "y_train is None"
-    assert y_test is not None, "y_test is None"
-    assert isinstance(recommendations, pd.DataFrame), "recommendations is not a DataFrame"
-    assert X_test_inverse is not None, "X_test_inverse is None"
-    
-    # Manually save the DataFrames to CSV files
-    processed_data_dir = Path(config['execution']['train']['output_dir']) / "Linear_Regression"
-    processed_data_dir.mkdir(parents=True, exist_ok=True)  # Ensure the directory exists
-    
-    # Save each DataFrame to its respective CSV file
-    X_train.to_csv(processed_data_dir / "X_train.csv", index=False)
-    y_train.to_csv(processed_data_dir / "y_train.csv", index=False)
-    X_test.to_csv(processed_data_dir / "X_test.csv", index=False)
-    y_test.to_csv(processed_data_dir / "y_test.csv", index=False)
-    recommendations.to_csv(processed_data_dir / "preprocessing_recommendations.csv", index=False)
-    
-    # Now perform the assertions to check if files exist
-    assert (processed_data_dir / "X_train.csv").exists(), "X_train.csv not found"
-    assert (processed_data_dir / "y_train.csv").exists(), "y_train.csv not found"
-    assert (processed_data_dir / "X_test.csv").exists(), "X_test.csv not found"
-    assert (processed_data_dir / "y_test.csv").exists(), "y_test.csv not found"
-    assert (processed_data_dir / "preprocessing_recommendations.csv").exists(), "preprocessing_recommendations.csv not found"
+        # 4. final_preprocessing in train mode
+        try:
+            X_train, X_test, y_train, y_test, recommendations, X_test_inverse = preprocessor_train.final_preprocessing(real_dataset)
+        except Exception as e:
+            pytest.fail(f"Training final_preprocessing failed for {model_sub_type}: {e}")
 
+        # Basic assertions
+        assert X_train is not None, f"X_train is None for {model_sub_type}"
+        assert y_train is not None, f"y_train is None for {model_sub_type}"
+        assert isinstance(recommendations, pd.DataFrame), f"recommendations is not a DataFrame for {model_sub_type}"
+        # For classification/regression, we expect X_test, y_test, X_test_inverse
+        assert X_test is not None, f"X_test is None for {model_sub_type}"
+        assert y_test is not None, f"y_test is None for {model_sub_type}"
+        assert X_test_inverse is not None, f"X_test_inverse is None for {model_sub_type}"
 
+        # 5. Check that transformers.pkl is created
+        transformers_file = transformers_dir / 'transformers.pkl'
+        assert transformers_file.exists(), f"transformers.pkl not found after train mode for {model_sub_type}"
 
-def test_train_mode_svm(config, real_dataset, tmp_path, mocker):
-    """Test training mode for Support Vector Machine using real dataset and config."""
-    
-    # Update paths in configuration to use temporary directories
-    config['current_model'] = "Support Vector Machine"
-    config['execution']['train']['output_dir'] = str(tmp_path / "processed_data")
-    config['execution']['train']['save_transformers_path'] = str(tmp_path / "transformers")
-    config['execution']['train']['model_save_path'] = str(tmp_path / "models")
-    
-    # Mock SMOTE to prevent issues due to class imbalance in small datasets
-    mock_smote = mocker.patch('imblearn.over_sampling.SMOTENC.fit_resample', return_value=(real_dataset.drop('result', axis=1), real_dataset['result']))
-    
-    # Initialize DataPreprocessor
-    preprocessor = DataPreprocessor(
-        model_type=config['current_model'],
-        y_variable=config['features']['y_variable'],
-        ordinal_categoricals=config['features']['ordinal_categoricals'],
-        nominal_categoricals=config['features']['nominal_categoricals'],
-        numericals=config['features']['numericals'],
-        mode=config['execution']['train']['mode'],
-        options=config['models'][config['current_model']],
-        debug=config.get('logging', {}).get('debug', False)
-    )
-    
-    # Execute Preprocessing
-    try:
-        X_train, X_test, y_train, y_test, recommendations, X_test_inverse = preprocessor.final_preprocessing(real_dataset)
-    except Exception as e:
-        pytest.fail(f"Preprocessing raised an exception: {e}")
-    
-    # Assertions for returned objects
-    assert X_train is not None, "X_train is None"
-    assert X_test is not None, "X_test is None"
-    assert y_train is not None, "y_train is None"
-    assert y_test is not None, "y_test is None"
-    assert isinstance(recommendations, pd.DataFrame), "recommendations is not a DataFrame"
-    assert X_test_inverse is not None, "X_test_inverse is None"
-    
-    # Manually save the DataFrames to CSV files
-    processed_data_dir = Path(config['execution']['train']['output_dir']) / "Support_Vector_Machine"
-    processed_data_dir.mkdir(parents=True, exist_ok=True)  # Ensure the directory exists
-    
-    # Save each DataFrame to its respective CSV file
-    X_train.to_csv(processed_data_dir / "X_train.csv", index=False)
-    y_train.to_csv(processed_data_dir / "y_train.csv", index=False)
-    X_test.to_csv(processed_data_dir / "X_test.csv", index=False)
-    y_test.to_csv(processed_data_dir / "y_test.csv", index=False)
-    recommendations.to_csv(processed_data_dir / "preprocessing_recommendations.csv", index=False)
-    
-    # Now perform the assertions to check if files exist
-    assert (processed_data_dir / "X_train.csv").exists(), "X_train.csv not found"
-    assert (processed_data_dir / "y_train.csv").exists(), "y_train.csv not found"
-    assert (processed_data_dir / "X_test.csv").exists(), "X_test.csv not found"
-    assert (processed_data_dir / "y_test.csv").exists(), "y_test.csv not found"
-    assert (processed_data_dir / "preprocessing_recommendations.csv").exists(), "preprocessing_recommendations.csv not found"
+        # =============== MODEL TRAINING ===============
+        # Instead of using MagicMock, instantiate a real dummy model
+        model = get_dummy_model(model_type)
+
+        # Fit the model on the training data
+        try:
+            model.fit(X_train, y_train)
+        except Exception as e:
+            pytest.fail(f"Model fitting failed for {model_sub_type}: {e}")
+
+        # Save the trained model to disk
+        model_path = construct_model_path(model_save_base_dir, model_sub_type)
+        try:
+            joblib.dump(model, model_path)
+        except Exception as e:
+            pytest.fail(f"Failed to save trained model for {model_sub_type}: {e}")
+
+        # Verify model is saved
+        assert model_path.exists(), f"Trained model file not found at {model_path} for {model_sub_type}"
+
+        # =============== PREDICT MODE ===============
+        preprocessor_predict = DataPreprocessor(
+            model_type=model_type,
+            y_variable=config['features'].get('y_variable', None),
+            ordinal_categoricals=config['features'].get('ordinal_categoricals', []),
+            nominal_categoricals=config['features'].get('nominal_categoricals', []),
+            numericals=config['features'].get('numericals', []),
+            mode='predict',
+            options=model_config,
+            debug=True,
+            normalize_debug=True,
+            normalize_graphs_output=True,
+            graphs_output_dir=tmp_path / "plots",
+            transformers_dir=transformers_dir
+        )
+
+        # 6. final_preprocessing in predict mode
+        try:
+            X_preprocessed, recommendations_pred, X_inversed = preprocessor_predict.final_preprocessing(real_dataset)
+        except Exception as e:
+            pytest.fail(f"Prediction final_preprocessing failed for {model_sub_type}: {e}")
+
+        # Basic assertions for predict mode
+        assert X_preprocessed is not None, f"X_preprocessed is None for {model_sub_type}"
+        assert isinstance(recommendations_pred, pd.DataFrame), f"recommendations_pred is not DataFrame for {model_sub_type}"
+        assert X_inversed is not None, f"X_inversed is None for {model_sub_type}"
+
+        # 7. Load the trained model
+        try:
+            loaded_model = joblib.load(model_path)
+        except Exception as e:
+            pytest.fail(f"Failed to load trained model for {model_sub_type}: {e}")
+
+        # 8. Make Predictions
+        try:
+            predictions = loaded_model.predict(X_preprocessed)
+        except Exception as e:
+            pytest.fail(f"Prediction failed for {model_sub_type}: {e}")
+
+        # 9. Attach predictions to the inversed data
+        if len(predictions) == len(X_inversed):
+            X_inversed = X_inversed.copy()  # To avoid SettingWithCopyWarning
+            X_inversed['predictions'] = predictions
+            assert 'predictions' in X_inversed.columns, f"'predictions' column not found in X_inversed for {model_sub_type}"
+            assert len(predictions) == len(X_inversed), f"Length mismatch between predictions and X_inversed for {model_sub_type}"
+        else:
+            pytest.fail("Predictions length does not match inversed data length.")
+
+        # 10. Save Predictions
+        predictions_file = construct_predictions_path(predictions_output_dir, model_sub_type)
+        try:
+            X_inversed.to_csv(predictions_file, index=False)
+        except Exception as e:
+            pytest.fail(f"Failed to save predictions for {model_sub_type}: {e}")
+
+        # Assertions to Check if Files are Saved
+        assert predictions_file.exists(), f"Predictions file not found at {predictions_file} for {model_sub_type}"
+
+        # End of test for this (model_type, model_sub_type) combo

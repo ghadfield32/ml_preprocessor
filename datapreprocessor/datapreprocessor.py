@@ -618,7 +618,8 @@ class DataPreprocessor:
         if transformers:
             self.preprocessor = ColumnTransformer(
                 transformers=transformers,
-                remainder='passthrough'  # Keep other columns unchanged
+                remainder='passthrough',
+                verbose_feature_names_out=False  # Disable prefixing
             )
 
             # Fit and transform training data
@@ -760,7 +761,7 @@ class DataPreprocessor:
                     # Do not attempt to transform dummy data here
                     self.logger.debug(f"Pipeline loaded. Ready to transform new data.")
                 except AttributeError as e:
-                    self.logger.error(f"Pipeline's `get_feature_names_out` is not available: {e}")
+                    self.logger.error(f"Pipeline's get_feature_names_out is not available: {e}")
                     expected_features = []
             else:
                 self.logger.error("❌ Preprocessor is not loaded.")
@@ -1007,84 +1008,96 @@ class DataPreprocessor:
             raise
 
 
-    def inverse_transform_data(self, X_transformed: np.ndarray) -> pd.DataFrame:
+    def inverse_transform_data(self, X_transformed: np.ndarray, original_data: Optional[pd.DataFrame] = None) -> pd.DataFrame:
         """
         Perform inverse transformation on the transformed data to reconstruct original feature values.
 
         Args:
             X_transformed (np.ndarray): The transformed feature data.
+            original_data (Optional[pd.DataFrame]): The original data before transformation.
 
         Returns:
-            pd.DataFrame: The inverse-transformed DataFrame.
+            pd.DataFrame: The inverse-transformed DataFrame or the original data if no transformations were applied.
         """
         if self.pipeline is None:
             self.logger.error("Preprocessing pipeline has not been fitted. Cannot perform inverse transformation.")
-            raise AttributeError("Preprocessing pipeline has not been fitted. Cannot perform inverse transformation.")
+            raise AttributeError("Preprocessing pipeline has not been fitted.")
 
         preprocessor = self.pipeline
         logger = logging.getLogger('InverseTransform')
-        if self.debug:
+        if self.debug or self.get_debug_flag('debug_final_inverse_transformations'):
             logger.setLevel(logging.DEBUG)
         else:
             logger.setLevel(logging.INFO)
 
-        logger.debug("Starting inverse transformation.")
+        logger.debug(f"[DEBUG Inverse] Starting inverse transformation. Input shape: {X_transformed.shape}")
 
-        # Initialize dictionaries to hold inverse-transformed data
-        inverse_data = {}
+        # 1. Examine the pipeline’s transformers
+        logger.debug(f"[DEBUG Inverse] pipeline.transformers_: {[tr[0] for tr in preprocessor.transformers_]}")
 
-        # Initialize index tracker
         start_idx = 0
+        inverse_data = {}
+        transformations_applied = False  # Flag to check if any transformations are applied
 
-        # Iterate through each transformer in the ColumnTransformer
         for name, transformer, features in preprocessor.transformers_:
             if name == 'remainder':
-                continue  # Skip any remainder features
-            # Extract the transformed data for current transformer
-            if name == 'num':
-                end_idx = start_idx + len(features)
-                numerical_data = X_transformed[:, start_idx:end_idx]
+                logger.debug(f"[DEBUG Inverse] Skipping remainder block.")
+                continue
+
+            end_idx = start_idx + len(features)
+            slice_shape = X_transformed[:, start_idx:end_idx].shape
+            logger.debug(f"[DEBUG Inverse] Transformer '{name}' has features {features}, slicing X_transformed "
+                        f"from {start_idx} to {end_idx} => shape {slice_shape}")
+
+            if hasattr(transformer, 'named_steps'):
+                # Check for scaler or encoder with inverse_transform
                 scaler = transformer.named_steps.get('scaler', None)
-                if scaler and hasattr(scaler, 'inverse_transform'):
-                    numerical_inverse = scaler.inverse_transform(numerical_data)
-                    inverse_data.update({feature: numerical_inverse[:, idx] for idx, feature in enumerate(features)})
-                    logger.debug(f"Numerical features {features} inverse transformed.")
-                else:
-                    logger.warning(f"No scaler found for numerical features {features}. Skipping inverse transformation.")
-                start_idx = end_idx
-            elif name == 'ord':
                 ordinal_encoder = transformer.named_steps.get('ordinal_encoder', None)
-                if ordinal_encoder and hasattr(ordinal_encoder, 'inverse_transform'):
-                    ordinal_inverse = ordinal_encoder.inverse_transform(X_transformed[:, start_idx:start_idx + len(features)])
-                    inverse_data.update({feature: ordinal_inverse[:, idx] for idx, feature in enumerate(features)})
-                    logger.debug(f"Ordinal features {features} inverse transformed.")
-                    start_idx += len(features)
-                else:
-                    logger.warning(f"No OrdinalEncoder found for features {features}. Skipping inverse transformation.")
-            elif name.startswith('nom'):
                 onehot_encoder = transformer.named_steps.get('onehot_encoder', None)
+
+                # Handle numerical scaler
+                if scaler and hasattr(scaler, 'inverse_transform') and scaler != 'passthrough':
+                    logger.debug(f"[DEBUG Inverse] Found scaler for numeric features {features}. Inverting...")
+                    numerical_inverse = scaler.inverse_transform(X_transformed[:, start_idx:end_idx])
+                    for idx, f_col in enumerate(features):
+                        inverse_data[f_col] = numerical_inverse[:, idx]
+                    transformations_applied = True
+
+                # Handle ordinal encoder
+                if ordinal_encoder and hasattr(ordinal_encoder, 'inverse_transform'):
+                    logger.debug(f"[DEBUG Inverse] Found OrdinalEncoder for ordinal features {features}. Inverting...")
+                    ordinal_inverse = ordinal_encoder.inverse_transform(X_transformed[:, start_idx:end_idx])
+                    for idx, f_col in enumerate(features):
+                        inverse_data[f_col] = ordinal_inverse[:, idx]
+                    transformations_applied = True
+
+                # Handle onehot encoder
                 if onehot_encoder and hasattr(onehot_encoder, 'inverse_transform'):
-                    # Determine the number of categories for this encoder
-                    n_categories = len(onehot_encoder.categories_[0])
-                    nominal_data = X_transformed[:, start_idx:start_idx + n_categories]
-                    nominal_inverse = onehot_encoder.inverse_transform(nominal_data)
-                    inverse_data.update({features[0]: nominal_inverse[:, 0]})
-                    logger.debug(f"Nominal feature '{features[0]}' inverse transformed.")
-                    start_idx += n_categories
-                else:
-                    logger.warning(f"No OneHotEncoder found for nominal features {features}. Skipping inverse transformation.")
+                    logger.debug(f"[DEBUG Inverse] Found OneHotEncoder for nominal features {features}. Inverting...")
+                    nominal_inverse = onehot_encoder.inverse_transform(X_transformed[:, start_idx:end_idx])
+                    # OneHotEncoder may expand into multiple columns; assuming original columns are single
+                    for idx, f_col in enumerate(features):
+                        inverse_data[f_col] = nominal_inverse[:, idx]
+                    transformations_applied = True
+
+            start_idx = end_idx
+
+        if transformations_applied:
+            # Construct the final DataFrame
+            inverse_df = pd.DataFrame(inverse_data, index=original_data.index if original_data is not None else None)
+            logger.debug(f"[DEBUG Inverse] Inverse DataFrame shape: {inverse_df.shape}")
+            logger.debug(f"[DEBUG Inverse] Sample:\n{inverse_df.head()}")
+        else:
+            if original_data is not None:
+                logger.warning("⚠️ No reversible transformations were applied. Returning the original data as inverse-transformed data.")
+                inverse_df = original_data.copy()
+                logger.debug(f"[DEBUG Inverse] Returning original_data copy with shape: {inverse_df.shape}")
             else:
-                logger.warning(f"Unknown transformer '{name}'. Skipping inversion.")
-
-        # Create the inverse-transformed DataFrame
-        inverse_df = pd.DataFrame(inverse_data)
-
-        logger.debug("Inverse-transformed DataFrame constructed.")
-        logger.debug(f"Inverse-transformed DataFrame shape: {inverse_df.shape}")
-
-        logger.info("✅ Inverse transformation completed successfully.")
+                logger.error("❌ No transformations were applied and original data was not provided. Cannot perform inverse transformation.")
+                raise ValueError("No transformations were applied and original data was not provided.")
 
         return inverse_df
+
 
     def build_pipeline(self, X_train: pd.DataFrame) -> ColumnTransformer:
         transformers = []
@@ -1178,8 +1191,6 @@ class DataPreprocessor:
                 for feature in self.nominal_categoricals:
                     freq = X_train[feature].value_counts(normalize=True)
                     X_train[feature] = X_train[feature].map(freq)
-                    if X_test is not None:
-                        X_test[feature] = X_test[feature].map(freq).fillna(0)
                     self.feature_reasons[feature] += 'Frequency Encoding applied | '
                     self.logger.debug(f"Frequency Encoding applied to '{feature}'.")
             else:
@@ -1268,7 +1279,7 @@ class DataPreprocessor:
         try:
             # Use the final test dataset (fully transformed) for inverse transformations
             if X_test_final is not None:
-                X_test_inverse = self.inverse_transform_data(X_test_final.values)
+                X_test_inverse = self.inverse_transform_data(X_test_final.values, original_data=X_test_original)
                 self.logger.info("✅ Inverse transformations applied successfully.")
         except Exception as e:
             self.logger.error(f"❌ Inverse transformations failed: {e}")
@@ -1276,6 +1287,7 @@ class DataPreprocessor:
 
         # Return processed datasets
         return X_train_final, X_test_final, y_train_smoted, y_test, recommendations, X_test_inverse
+
 
     def transform(self, X: pd.DataFrame) -> np.ndarray:
         """
@@ -1364,16 +1376,39 @@ class DataPreprocessor:
 
         # Transform data using the loaded pipeline
         try:
-            X_preprocessed = self.pipeline.transform(X_filtered)
-            self.logger.debug(f"Transformed data shape: {X_preprocessed.shape}")
+            X_preprocessed_np = self.pipeline.transform(X_filtered)
+            self.logger.debug(f"Transformed data shape: {X_preprocessed_np.shape}")
         except Exception as e:
             self.logger.error(f"❌ Transformation failed: {e}")
             raise
 
-        # Inverse transform for interpretability (optional)
+        # Retrieve feature names from the pipeline or use stored final_feature_order
+        if hasattr(self.pipeline, 'get_feature_names_out'):
+            try:
+                columns = self.pipeline.get_feature_names_out()
+                self.logger.debug(f"Derived feature names from pipeline: {columns.tolist()}")
+            except Exception as e:
+                self.logger.warning(f"Could not retrieve feature names from pipeline: {e}")
+                columns = self.final_feature_order
+                self.logger.debug(f"Using stored final_feature_order for column names: {columns}")
+        else:
+            columns = self.final_feature_order
+            self.logger.debug(f"Using stored final_feature_order for column names: {columns}")
+
+        # Convert NumPy array back to DataFrame with correct column names
         try:
-            X_inversed = self.inverse_transform_data(X_preprocessed)
-            self.logger.debug(f"Inverse-transformed data shape: {X_inversed.shape}")
+            X_preprocessed_df = pd.DataFrame(X_preprocessed_np, columns=columns, index=X_filtered.index)
+            self.logger.debug(f"X_preprocessed_df columns: {X_preprocessed_df.columns.tolist()}")
+            self.logger.debug(f"Sample of X_preprocessed_df:\n{X_preprocessed_df.head()}")
+        except Exception as e:
+            self.logger.error(f"❌ Failed to convert transformed data to DataFrame: {e}")
+            raise
+
+        # Inverse transform for interpretability (optional, for interpretability)
+        try:
+            self.logger.debug(f"[DEBUG] Original data shape before inverse transform: {X.shape}")
+            X_inversed = self.inverse_transform_data(X_preprocessed_np, original_data=X)
+            self.logger.debug(f"[DEBUG] Inversed data shape: {X_inversed.shape}")
         except Exception as e:
             self.logger.error(f"❌ Inverse transformation failed: {e}")
             X_inversed = None
@@ -1387,7 +1422,9 @@ class DataPreprocessor:
             recommendations = pd.DataFrame()
 
         # Prepare outputs
-        return X_preprocessed, recommendations, X_inversed
+        return X_preprocessed_df, recommendations, X_inversed
+
+
 
     def preprocess_clustering(self, X: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
         """
@@ -1483,7 +1520,8 @@ class DataPreprocessor:
             # For predict mode, y_variable is not used
             X = data.copy()
             # Ensure that transformers are loaded
-            if not os.path.exists(os.path.join(self.transformers_dir, 'transformers.pkl')):
+            transformers_path = os.path.join(self.transformers_dir, 'transformers.pkl')
+            if not os.path.exists(transformers_path):
                 self.logger.error(f"❌ Transformers file not found at '{self.transformers_dir}'. Cannot proceed with prediction.")
                 raise FileNotFoundError(f"Transformers file not found at '{self.transformers_dir}'.")
 
@@ -1501,6 +1539,7 @@ class DataPreprocessor:
         else:
             raise NotImplementedError(f"Mode '{self.mode}' is not implemented.")
 
+
     # Optionally, implement a method to display column info for debugging
     def _debug_column_info(self, df: pd.DataFrame, step: str = "Debug Column Info"):
         """
@@ -1514,8 +1553,3 @@ class DataPreprocessor:
         for col in df.columns:
             self.logger.debug(f"Column '{col}': {df[col].dtype}, Unique Values: {df[col].nunique()}")
         self.logger.debug("\n")
-
-
-    
-
-

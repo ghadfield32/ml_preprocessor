@@ -88,7 +88,7 @@ preprocessor = DataPreprocessor(
 )
 
 # Execute Preprocessing
-X_train, X_test, y_train, y_test, recommendations, X_test_inverse = preprocessor.preprocess_train(
+X_train, X_test, y_train, y_test, recommendations, X_test_inverse = preprocessor.final_preprocessing(
     df.drop('target', axis=1), 
     df['target']
 )
@@ -120,7 +120,7 @@ preprocessor = DataPreprocessor(
 )
 
 # Execute Preprocessing
-X_preprocessed, recommendations, X_inversed = preprocessor.preprocess_predict(new_data)
+X_preprocessed, recommendations, X_inversed = preprocessor.final_preprocessing(new_data)
 ```
 
 ### Predict Preprocessing Adjustment Configuration
@@ -150,7 +150,7 @@ preprocessor = DataPreprocessor(
 )
 
 # Execute Preprocessing
-X_preprocessed, recommendations = preprocessor.preprocess_predict(new_data)
+X_preprocessed, recommendations = preprocessor.final_preprocessing(new_data)
 ```
 ## 🧪 Testing
 
@@ -167,81 +167,6 @@ Contributions are welcome! Please fork the repository and submit a pull request 
 ## 📄 License
 
 This project is licensed under the MIT License.
-
-
-🔧 Continuous Integration
-
-Continuous Integration (CI) ensures that every change made to the DataPreprocessor package is automatically tested and validated. This guarantees that new updates do not break existing functionalities and maintains the package's reliability.
-Purpose:
-
-    Automate Testing: Automatically run tests on every push and pull request to detect issues early.
-    Maintain Code Quality: Ensure that the codebase remains clean, efficient, and free from regressions.
-    Facilitate Collaboration: Allow multiple contributors to work seamlessly without interfering with each other's work.
-
-Action Items:
-
-    Define CI Workflow:
-        Use GitHub Actions to automate testing on every push and pull request.
-    Ensure Environment Consistency:
-        Specify and test against multiple Python versions to ensure compatibility.
-    Install Dependencies and Run Tests:
-        Automatically install required packages and execute your test suite to verify functionality.
-
-Implementation:
-
-    Move and Rename the Workflow File:
-
-    Move your existing gitactions file to .github/workflows/ci.yml:
-
-mkdir -p .github/workflows
-mv .actions/gitactions .github/workflows/ci.yml
-
-Sample ci.yml Workflow:
-
-Here's an example of what your .github/workflows/ci.yml might look like:
-
-    name: CI
-
-    on:
-      push:
-        branches: [ main ]
-      pull_request:
-        branches: [ main ]
-
-    jobs:
-      build:
-
-        runs-on: ubuntu-latest
-
-        strategy:
-          matrix:
-            python-version: [3.6, 3.7, 3.8, 3.9, 3.10]
-
-        steps:
-        - uses: actions/checkout@v2
-        - name: Set up Python ${{ matrix.python-version }}
-          uses: actions/setup-python@v2
-          with:
-            python-version: ${{ matrix.python-version }}
-        - name: Install dependencies
-          run: |
-            python -m pip install --upgrade pip
-            pip install -r requirements.txt
-            pip install .
-        - name: Run tests
-          run: |
-            pytest
-
-    Explanation:
-        Triggers: The workflow runs on every push and pull request to the main branch.
-        Environment: Tests are executed across multiple Python versions to ensure compatibility.
-        Steps:
-            Checkout Code: Retrieves the latest code from the repository.
-            Setup Python: Sets up the specified Python version.
-            Install Dependencies: Installs necessary packages and the DataPreprocessor package itself.
-            Run Tests: Executes the test suite using pytest.
-
-    This CI setup ensures that any changes to your package are immediately tested, maintaining the integrity and reliability of DataPreprocessor.
 
 🛠️ Contributing
 

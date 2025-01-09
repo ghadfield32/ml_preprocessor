@@ -2,30 +2,30 @@
 
 # Root-level keys
 model_types:
-  # - "Tree Based Classifier"
-  # - "Logistic Regression"
-  # - "K-Means"
-  # - "Linear Regression"
+  - "Tree Based Classifier"
+  - "Logistic Regression"
+  - "K-Means"
+  - "Linear Regression"
   - "Tree Based Regressor"
-  # - "Support Vector Machine"
+  - "Support Vector Machine"
 
 model_sub_types:
-  # Tree Based Classifier:
-  #   - "Random Forest"
-  #   - "XGBoost"
-  #   - "Decision Tree"
-  # Logistic Regression:
-  #   - "Logistic Regression"
-  # K-Means:
-  #   - "K-Means"
-  # Linear Regression:
-  #   - "Linear Regression"
+  Tree Based Classifier:
+    - "Random Forest"
+    - "XGBoost"
+    - "Decision Tree"
+  Logistic Regression:
+    - "Logistic Regression"
+  K-Means:
+    - "K-Means"
+  Linear Regression:
+    - "Linear Regression"
   Tree Based Regressor:
     - "Random Forest Regressor"
     - "XGBoost Regressor"
     - "Decision Tree Regressor"
-  # Support Vector Machine:
-  #   - "Support Vector Machine"
+  Support Vector Machine:
+    - "Support Vector Machine"
 
 features:
   ordinal_categoricals: []
@@ -51,8 +51,8 @@ features:
 
 paths:
   # Base directories
-  base_data_dir: "../../dataset/test/data"
-  raw_data_file: "final_ml_dataset.csv"
+  data_dir: "../../dataset/test/data"
+  raw_data: "final_ml_dataset.csv"
   processed_data_dir: "preprocessor/processed"
   features_metadata_file: "features_info/features_metadata.pkl"
   predictions_output_dir: "preprocessor/predictions"

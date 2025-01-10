@@ -168,6 +168,39 @@ X_preprocessed, recommendations = preprocessor.final_preprocessing(new_data)
 | **11. Configuration Management** | - **Method:** YAML configuration files<br>- **Dynamic Adjustment:** Based on `model_type`<br>- **Options:** Environment-specific configurations, Parameter tuning through configuration files                                                              | - **Method:** YAML configuration files<br>- **Dynamic Adjustment:** Based on `model_type`<br>- **Options:** Environment-specific configurations, Parameter tuning through configuration files                                                              | - **Method:** YAML configuration files<br>- **Dynamic Adjustment:** Based on `model_type`<br>- **Options:** Environment-specific configurations, Parameter tuning through configuration files                                                              | - **Method:** YAML configuration files<br>- **Dynamic Adjustment:** Based on `model_type`<br>- **Options:** Environment-specific configurations, Parameter tuning through configuration files                                                              | - **Method:** YAML configuration files<br>- **Dynamic Adjustment:** Based on `model_type`<br>- **Options:** Environment-specific configurations, Parameter tuning through configuration files                                                              | - **Method:** YAML configuration files<br>- **Dynamic Adjustment:** Based on `model_type`<br>- **Options:** Environment-specific configurations, Parameter tuning through configuration files                                                              | - **Environment-Specific Configurations:** Different settings for different environments (e.g., development, production)<br>- **Parameter Tuning:** Adjust preprocessing parameters via config files<br>- **Easy Adjustments:** Update YAML to change preprocessing steps per `model_type`                                                                                                                                                                                                |
 
 
+🔍 Explanation of Columns
+
+    Preprocessing Step: The sequential step in the data preprocessing workflow.
+
+    Model Types: Each column corresponds to a specific machine learning model type, detailing the preprocessing techniques applied at each step.
+
+    Additional Options: Other available methods and configurations that can be customized or extended based on specific project needs.
+
+🛠️ How to Use This Table
+
+    Identify the Steps: Review each preprocessing step to understand the necessary actions in the workflow.
+
+    Select Model-Specific Techniques: For your specific model type (e.g., Logistic Regression), identify the recommended techniques.
+
+    Explore Additional Options: Consider additional methods and configurations to further customize the preprocessing pipeline according to your dataset and project requirements.
+
+🔧 Customization Tips
+
+    YAML Configuration: Leverage the preprocessor_config.yaml file to adjust preprocessing parameters seamlessly. This allows you to tailor the preprocessing steps to different model types without modifying the code.
+
+    Pipeline Flexibility: Utilize scikit-learn's Pipeline and ColumnTransformer to create reusable and modular preprocessing workflows. This enhances maintainability and scalability.
+
+    Imputation Strategies: Experiment with different imputation methods to handle missing data effectively based on data distribution and model sensitivity. For example, using KNNImputer for models sensitive to feature scaling like Support Vector Machine.
+
+    Encoding Choices: Choose encoding techniques that best capture the relationships in your categorical data without introducing multicollinearity. For instance, using OneHotEncoder for nominal features in Logistic Regression.
+
+    Scaling Methods: Select scaling methods that align with your model's requirements. For example, MinMaxScaler is preferred for K-Means Clustering to ensure all features contribute equally to distance calculations.
+
+    Handling Class Imbalance: Select appropriate SMOTE variants based on your dataset's feature composition. Use SMOTENC for datasets with both numerical and categorical features in classification tasks, SMOTEN for purely categorical datasets, and SMOTE for purely numerical datasets. Additionally, you can choose other variants like BorderlineSMOTE, ADASYN, SMOTEENN, or SMOTETomek if further customization is needed.
+
+    Inverse Transformations: Utilize inverse transformations for interpretability of model predictions. This is especially useful in understanding how scaled or encoded features relate back to the original data.
+    
+
 ## 🛠️ Contributing
 
 Contributions are welcome! Please fork the repository and submit a pull request for any enhancements or bug fixes.

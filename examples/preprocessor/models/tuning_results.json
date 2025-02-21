@@ -1,45 +1,45 @@
 {
     "Random Forest": {
         "Best Params": {
-            "bootstrap": true,
-            "criterion": "gini",
-            "max_depth": 50,
+            "bootstrap": false,
+            "criterion": "entropy",
+            "max_depth": 39,
             "max_features": "log2",
-            "min_samples_leaf": 1,
-            "min_samples_split": 2,
-            "n_estimators": 10
+            "min_samples_leaf": 4,
+            "min_samples_split": 7,
+            "n_estimators": 12
         },
-        "Best CV Score": -0.47375842858482853,
+        "Best CV Score": -0.46138753267241367,
         "Evaluation Metrics": {
-            "accuracy": 0.72,
-            "precision": 0.7329411764705881,
-            "recall": 0.72,
-            "f1_score": 0.7253333333333333,
-            "roc_auc": 0.7182539682539683,
-            "log_loss": 1.891565604167116
+            "accuracy": 0.64,
+            "precision": 0.5842857142857143,
+            "recall": 0.64,
+            "f1_score": 0.6047552447552448,
+            "roc_auc": 0.6111111111111112,
+            "log_loss": 2.0496735996870377
         }
     },
     "Decision Tree": {
         "Best Params": {
             "criterion": "entropy",
-            "max_depth": 3,
-            "min_samples_leaf": 8,
-            "min_samples_split": 20,
-            "splitter": "random"
+            "max_depth": 2,
+            "min_samples_leaf": 4,
+            "min_samples_split": 2,
+            "splitter": "best"
         },
-        "Best CV Score": -0.6167987475602181,
+        "Best CV Score": -0.5669786271760092,
         "Evaluation Metrics": {
-            "accuracy": 0.56,
-            "precision": 0.612,
-            "recall": 0.56,
-            "f1_score": 0.5788235294117647,
-            "roc_auc": 0.4563492063492064,
-            "log_loss": 0.8345673551170053
+            "accuracy": 0.64,
+            "precision": 0.7745454545454545,
+            "recall": 0.64,
+            "f1_score": 0.6565517241379311,
+            "roc_auc": 0.738095238095238,
+            "log_loss": 1.9179904136939296
         }
     },
     "Best Model": {
         "model_name": "Decision Tree",
-        "metric_value": 0.8345673551170053,
-        "path": "C:\\Users\\ghadf\\vscode_projects\\docker_projects\\ml_preprocessor\\examples\\preprocessor\\models\\Decision_Tree\\trained_model.pkl"
+        "metric_value": 1.9179904136939296,
+        "path": "C:\\Users\\GeoffreyHadfield\\projects\\ml_preprocessor\\examples\\preprocessor\\models\\Decision_Tree\\trained_model.pkl"
     }
 }

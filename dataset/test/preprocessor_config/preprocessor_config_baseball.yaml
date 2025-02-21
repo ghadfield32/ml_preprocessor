@@ -35,7 +35,6 @@ model_sub_types:
 # Note: The "frame_time" column is not included here because it is automatically
 # appended for time series models.
 features:
-features:
   ordinal_categoricals:
     - ACC X (G) - FDS (81770)_spike_flag
     - ACC X (G) - FCU (81728)_spike_flag
@@ -58,6 +57,12 @@ features:
     - session_biomech
     - ongoing_timestamp_biomech
     - trial_biomech   # Trial numbers can be considered ordered categories.
+    - Date/Time
+    - Timestamp
+    - emg_time
+    - datetime
+    - session_time_biomech
+    - biomech_datetime
   nominal_categoricals:
     - Application
     - athlete_name_biomech
@@ -112,7 +117,7 @@ features:
     - shoulder_energy_transfer_biomech
     - shoulder_energy_generation_biomech
     - elbow_energy_transfer_biomech
-    #- elbow_energy_generation_biomech
+    - elbow_energy_generation_biomech
     - lead_knee_energy_transfer_biomech
     - lead_knee_energy_generation_biomech
     - elbow_moment_x_biomech
@@ -131,13 +136,13 @@ features:
     - biomech_datetime
   y_variable:
     #- valgus_torque_biomech <goal metric but not in at the moment
-    - elbow_energy_generation_biomech
+    - elbow_varus_moment_biomech
 
 
 paths:
   # Base directories
   data_dir: "../../dataset/test/data"
-  raw_data: "final_granular_dataset.csv"
+  raw_data: "final_inner_join_emg_biomech_data.parquet"
   processed_data_dir: "preprocessor/processed"
   features_metadata_file: "features_info/features_metadata.pkl"
   predictions_output_dir: "preprocessor/predictions"
@@ -494,9 +499,9 @@ models:
 # --- New time series section for LSTM models ---
 time_series:
   enabled: true
-  time_column: "frame_time"         # This must match the column name in the updated dataset.
+  time_column: "ongoing_timestamp_biomech"         # This must match the column name in the updated dataset.
   window_size: 30                   # Default sequence length (can be dynamically estimated if needed)
   horizon: 1                        # Number of future time steps to predict.
   step_size: 1                      # Stride for the sliding window.
   max_sequence_length: 30           # Optional: pad sequences to this length if needed.
-  use_dtw: false                    # Set to true to enable DTW alignment.
+  use_dtw: true                    # Set to true to enable DTW alignment.

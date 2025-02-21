@@ -32,3 +32,5 @@ dependencies:
     - pytest-mock
     - git+https://github.com/ghadfield32/ml_preprocessor # adding in custom preprocessing package
     - pyarrow
+    - tensorflow
+    - keras

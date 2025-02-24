@@ -53,4 +53,5 @@ dependencies:
     - tensorflow==2.12.0  # Added TensorFlow
     - keras==2.12.0      # Added Keras explicitly
     - smote_variants
+    - tensorflow-addons
     

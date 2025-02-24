@@ -36,24 +36,24 @@ model_sub_types:
 # appended for time series models.
 features:
   ordinal_categoricals:
-    - ACC X (G) - FDS (81770)_spike_flag
-    - ACC X (G) - FCU (81728)_spike_flag
-    - ACC Y (G) - FDS (81770)_spike_flag
-    - ACC Y (G) - FCU (81728)_spike_flag
-    - ACC Z (G) - FDS (81770)_spike_flag
-    - ACC Z (G) - FCU (81728)_spike_flag
-    - GYRO X (deg/s) - FDS (81770)_spike_flag
-    - GYRO X (deg/s) - FCU (81728)_spike_flag
-    - GYRO Y (deg/s) - FDS (81770)_spike_flag
-    - GYRO Y (deg/s) - FCU (81728)_spike_flag
-    - GYRO Z (deg/s) - FDS (81770)_spike_flag
-    - GYRO Z (deg/s) - FCU (81728)_spike_flag
-    - EMG 1 (mV) - FDS (81770)_spike_flag
-    - EMG_high_flag
-    - EMG_low_flag
-    - EMG_extreme_flag
-    - EMG_extreme_flag_dynamic
-    - ThrowingMotion
+    # - ACC X (G) - FDS (81770)_spike_flag
+    # - ACC X (G) - FCU (81728)_spike_flag
+    # - ACC Y (G) - FDS (81770)_spike_flag
+    # - ACC Y (G) - FCU (81728)_spike_flag
+    # - ACC Z (G) - FDS (81770)_spike_flag
+    # - ACC Z (G) - FCU (81728)_spike_flag
+    # - GYRO X (deg/s) - FDS (81770)_spike_flag
+    # - GYRO X (deg/s) - FCU (81728)_spike_flag
+    # - GYRO Y (deg/s) - FDS (81770)_spike_flag
+    # - GYRO Y (deg/s) - FCU (81728)_spike_flag
+    # - GYRO Z (deg/s) - FDS (81770)_spike_flag
+    # - GYRO Z (deg/s) - FCU (81728)_spike_flag
+    # - EMG 1 (mV) - FDS (81770)_spike_flag
+    # - EMG_high_flag
+    # - EMG_low_flag
+    # - EMG_extreme_flag
+    # - EMG_extreme_flag_dynamic
+    # - ThrowingMotion
     - session_biomech
     - ongoing_timestamp_biomech
     - trial_biomech   # Trial numbers can be considered ordered categories.
@@ -64,14 +64,14 @@ features:
     - session_time_biomech
     - biomech_datetime
   nominal_categoricals:
-    - Application
+    # - Application
     - athlete_name_biomech
     - athlete_traq_biomech
     - athlete_level_biomech
     - lab_biomech
     - pitch_type_biomech
     - handedness_biomech
-    - pitch_phase_biomech
+    # - pitch_phase_biomech
   numericals:
     - Collection Length (seconds)
     - EMG 1 (mV) - FDS (81770)
@@ -89,9 +89,9 @@ features:
     - GYRO Y (deg/s) - FCU (81728)
     - GYRO Z (deg/s) - FCU (81728)
     - EMG 1 (mV) - FCR (81745)
-    - pitch_speed_mph_biomech
-    - height_meters_biomech
-    - mass_kilograms_biomech
+    # - pitch_speed_mph_biomech
+    # - height_meters_biomech
+    # - mass_kilograms_biomech
     - shoulder_angle_x_biomech
     - shoulder_angle_y_biomech
     - shoulder_angle_z_biomech
@@ -126,17 +126,15 @@ features:
     - shoulder_thorax_moment_x_biomech
     - shoulder_thorax_moment_y_biomech
     - shoulder_thorax_moment_z_biomech
-    - max_shoulder_internal_rotational_velo_biomech
-  time_series_features:
-    - Date/Time
-    - Timestamp
-    - emg_time
-    - datetime
-    - session_time_biomech
-    - biomech_datetime
+    # - max_shoulder_internal_rotational_velo_biomech
+    # - elbow_varus_moment_biomech
   y_variable:
     #- valgus_torque_biomech <goal metric but not in at the moment
-    - elbow_varus_moment_biomech
+    # - elbow_varus_moment_biomech
+    #options
+    # - valgus_torque_biomech
+    - cumulative_valgus_phase_armcock_acc_biomech
+    # - cumulative_valgus_phase_biomech
 
 
 paths:

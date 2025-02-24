@@ -2,35 +2,55 @@ name: data_science_ml_preprocessor
 channels:
   - conda-forge
   - defaults
+
 dependencies:
-  - python=3.10
-  - numpy=1.23.5
-  - pandas
+  # Core interpreter and libraries
+  - python=3.10.12
+  - numpy=1.24.3
+  - scipy=1.10.1
+  - pandas=2.0.3
   - scikit-learn=1.2.2
-  - matplotlib
-  - seaborn
-  - jupyter
-  - ipykernel
-  - pytest
-  - black
-  - flake8
-  - mypy
-  - scikit-optimize
-  - imbalanced-learn
-  - xgboost
-  - catboost
-  - lightgbm
-  - pip
-  - shap
-  - fastapi
-  - uvicorn
-  - pyyaml
-  - conda-build
+  - pyarrow=12.0.1  # Moved from pip to conda
+  - fastparquet=2023.7.0  # Moved from pip to conda
+  - pytest-mock=3.14.0  # Moved from pip to conda
+
+  # Visualization and plotting
+  - matplotlib=3.7.2
+  - seaborn=0.12.2
+  
+  # Notebook and kernel support
+  - jupyter=1.0.0
+  - ipykernel=6.25.0
+  
+  # Testing and code quality
+  - pytest=7.4.0
+  - black=23.7.0
+  - flake8=6.1.0
+  - mypy=1.4.1
+  
+  # Additional scientific libraries
+  - scikit-optimize=0.9.0
+  - imbalanced-learn=0.10.1
+  - xgboost=1.7.6
+  - catboost=1.2
+  - lightgbm=3.3.5
+  - shap=0.42.1
+  
+  # API and server support
+  - fastapi=0.100.0
+  - uvicorn=0.23.2
+  
+  # YAML and build tools
+  - pyyaml=6.0
+  - conda-build=3.26.1
+  - pip=23.2.1
+
+  # Minimal pip dependencies
   - pip:
-    - pretty_errors 
-    - gdown
-    - pytest-mock
-    - git+https://github.com/ghadfield32/ml_preprocessor # adding in custom preprocessing package
-    - pyarrow
-    - tensorflow
-    - keras
+    - pretty_errors==1.2.25
+    - gdown==5.2.0
+    #- git+https://github.com/ghadfield32/ml_preprocessor
+    - tensorflow==2.12.0  # Added TensorFlow
+    - keras==2.12.0      # Added Keras explicitly
+    - smote_variants
+    

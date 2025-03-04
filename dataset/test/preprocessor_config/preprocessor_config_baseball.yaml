@@ -36,15 +36,15 @@ model_sub_types:
 # appended for time series models.
 features:
   ordinal_categoricals:
-    - session_biomech
+    # - session_biomech # Remove - used for grouping, not as a feature
     # - ongoing_timestamp_biomech
-    - trial_biomech   # Trial numbers can be considered ordered categories.
+    # - trial_biomech   # Remove - used for grouping, not as a feature
     # - Date/Time
     # - Timestamp
     # - emg_time
     # - datetime
     # - session_time_biomech
-    - biomech_datetime
+    # - biomech_datetime # Remove - used for time ordering, not as a feature
   nominal_categoricals:
     # - Application
     - athlete_name_biomech

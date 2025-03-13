@@ -55,21 +55,8 @@ features:
     - handedness_biomech
     - pitch_phase_biomech
   numericals:
-    - Collection Length (seconds)
-    - EMG 1 (mV) - FDS (81770)
-    - ACC X (G) - FDS (81770)
-    - ACC Y (G) - FDS (81770)
-    - ACC Z (G) - FDS (81770)
-    - GYRO X (deg/s) - FDS (81770)
-    - GYRO Y (deg/s) - FDS (81770)
-    - GYRO Z (deg/s) - FDS (81770)
+    # - Collection Length (seconds)
     - EMG 1 (mV) - FCU (81728)
-    - ACC X (G) - FCU (81728)
-    - ACC Y (G) - FCU (81728)
-    - ACC Z (G) - FCU (81728)
-    - GYRO X (deg/s) - FCU (81728)
-    - GYRO Y (deg/s) - FCU (81728)
-    - GYRO Z (deg/s) - FCU (81728)
     - EMG 1 (mV) - FCR (81745)
     - shoulder_angle_x_biomech
     - shoulder_angle_y_biomech

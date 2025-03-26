@@ -2,7 +2,7 @@
 FROM nvidia/cuda:12.0.0-base-ubuntu22.04
 
 # Define ARGs
-ARG ENV_NAME=data_science_ml_preprocessor
+ARG ENV_NAME=data_science_ml_preprocessor3
 ARG PYTHON_VER=3.10
 
 # Prevent tzdata from asking for user input

@@ -1,4 +1,4 @@
-name: data_science_ml_preprocessor
+name: data_science_ml_preprocessor3
 channels:
   - conda-forge
   - defaults
@@ -10,10 +10,10 @@ dependencies:
   - scipy=1.10.1
   - pandas=2.0.3
   - scikit-learn=1.2.2
-  - pyarrow=12.0.1  # Moved from pip to conda
-  - fastparquet=2023.7.0  # Moved from pip to conda
-  - pytest-mock=3.14.0  # Moved from pip to conda
-
+  - pyarrow=12.0.1
+  - fastparquet=2023.7.0
+  - pytest-mock=3.14.0
+  - protobuf
   # Visualization and plotting
   - matplotlib=3.7.2
   - seaborn=0.12.2
@@ -44,20 +44,14 @@ dependencies:
   - pyyaml=6.0
   - conda-build=3.26.1
   - pip=23.2.1
-
   # Minimal pip dependencies
   - pip:
     - pretty_errors==1.2.25
     - gdown==5.2.0
-    #- git+https://github.com/ghadfield32/ml_preprocessor
-    - tensorflow==2.12.0  # Added TensorFlow
-    - keras==2.12.0      # Added Keras explicitly
-    - smote_variants
-    - tensorflow_addons
+    - tensorflow==2.12.0
+    - keras==2.12.0
+    - smote-variants
+    - tensorflow-addons
     - keras-tcn 
-    - feature-engine==1.8.3
     - pyts
-
-    
-    
-    
+    - feature-engine==1.6.0   # Downgraded to preserve compatibility with scikit-learn 1.2.2

@@ -35,41 +35,76 @@ model_sub_types:
 # Note: The "frame_time" column is not included here because it is automatically
 # appended for time series models.
 features:
-  ordinal_categoricals: []
-  nominal_categoricals: 
-    - shooting_motion
-    - trial_id
+  ordinal_categoricals:
+    # - session_biomech # Remove - used for grouping, not as a feature
+    # - ongoing_timestamp_biomech
+    # - trial_biomech   # Remove - used for grouping, not as a feature
+    # - Date/Time
+    # - Timestamp
+    # - emg_time
+    # - datetime
+    # - session_time_biomech
+    # - biomech_datetime # Remove - used for time ordering, not as a feature
+  nominal_categoricals:
+    # - Application
+    - athlete_name_biomech
+    - athlete_traq_biomech
+    - athlete_level_biomech
+    - lab_biomech
+    # - pitch_type_biomech
+    - handedness_biomech
+    - pitch_phase_biomech
   numericals:
-    # These are example numerical features from your updated dataset.
-    - landing_x
-    - landing_y
-    - entry_angle
-    - ball_x
-    - ball_y
-    - ball_z
-    - R_EYE_x
-    - R_EYE_y
-    - R_EYE_z
-    - L_EYE_x
-    - L_EYE_y
-    - L_EYE_z
-    - NOSE_x
-    - NOSE_y
-    - NOSE_z
-    - R_SHOULDER_x
-    - R_SHOULDER_y
-    - R_SHOULDER_z
-    - L_SHOULDER_x
-    - L_SHOULDER_y
-    - L_SHOULDER_z
-    # ... add additional columns as needed from your updated dataset.
+    # - Collection Length (seconds)
+    - EMG 1 (mV) - FCU (81728)
+    - EMG 1 (mV) - FCR (81745)
+    - shoulder_angle_x_biomech
+    - shoulder_angle_y_biomech
+    - shoulder_angle_z_biomech
+    - elbow_angle_x_biomech
+    - elbow_angle_y_biomech
+    - elbow_angle_z_biomech
+    - torso_angle_x_biomech
+    - torso_angle_y_biomech
+    - torso_angle_z_biomech
+    - pelvis_angle_x_biomech
+    - pelvis_angle_y_biomech
+    - pelvis_angle_z_biomech
+    - shoulder_velo_x_biomech
+    - shoulder_velo_y_biomech
+    - shoulder_velo_z_biomech
+    - elbow_velo_x_biomech
+    - elbow_velo_y_biomech
+    - elbow_velo_z_biomech
+    - torso_velo_x_biomech
+    - torso_velo_y_biomech
+    - torso_velo_z_biomech
+    - trunk_pelvis_dissociation_biomech
+    - shoulder_energy_transfer_biomech
+    - shoulder_energy_generation_biomech
+    - elbow_energy_transfer_biomech
+    - elbow_energy_generation_biomech
+    - lead_knee_energy_transfer_biomech
+    - lead_knee_energy_generation_biomech
+    - elbow_moment_x_biomech
+    - elbow_moment_y_biomech
+    - elbow_moment_z_biomech
+    - shoulder_thorax_moment_x_biomech
+    - shoulder_thorax_moment_y_biomech
+    - shoulder_thorax_moment_z_biomech
+
   y_variable:
-    - result
+    # - elbow_varus_moment_biomech
+    #options
+    # - valgus_torque_biomech
+    - cumulative_valgus_phase_armcock_acc_biomech
+    # - cumulative_valgus_phase_biomech
+
 
 paths:
   # Base directories
   data_dir: "../../dataset/test/data"
-  raw_data: "final_granular_dataset.csv"
+  raw_data: "final_inner_join_emg_biomech_data.parquet"
   processed_data_dir: "preprocessor/processed"
   features_metadata_file: "features_info/features_metadata.pkl"
   predictions_output_dir: "preprocessor/predictions"
@@ -83,7 +118,7 @@ paths:
   training_output_dir: "../preprocessor/training_output"
 
 models:
-  Tree Based Classifier:
+  Tree Based Classifier: # Logistic Regression, K-Means, Linear Regression, Tree Based Regressor, Support Vector Machine
     split_dataset:
       test_size: 0.2
       random_state: 42
@@ -96,289 +131,6 @@ models:
         strategy: most_frequent
         imputer: SimpleImputer
         fill_value: "Missing"
-    test_normality:
-      p_value_threshold: 0.05
-      skewness_threshold: 1.0
-      use_p_value_other_models: false
-    handle_outliers:
-      zscore_threshold: 3
-      iqr_multiplier: 1.5
-      apply_zscore: false
-      apply_iqr: true
-      apply_winsor: false
-      winsor_limits: [0.05, 0.05]
-      apply_isolation_forest: false
-      contamination: 0.05
-    choose_transformations:
-      method: power
-      power_method: yeo-johnson
-      skewness_threshold: 1.0
-    encode_categoricals:
-      ordinal_encoding: OrdinalEncoder
-      nominal_encoding: OneHotEncoder
-      handle_unknown: ignore
-    apply_scaling:
-      method: StandardScaler
-    implement_smote:
-      variant: SMOTENC
-      params:
-        k_neighbors: 5
-        sampling_strategy: 'auto'
-    inverse_transformations:
-      inverse_scaling: true
-      inverse_transformation: true
-      inverse_encoding: true
-    debug_split_dataset: true
-    debug_handle_missing_values: true
-    debug_test_normality: true
-    debug_handle_outliers: true
-    debug_choose_transformations: true
-    debug_encode_categoricals: true
-    debug_apply_scaling: true
-    debug_implement_smote: true
-    debug_final_inverse_transformations: true
-    debug_validate_inverse_transformations: true
-    debug_generate_recommendations: true
-
-  Logistic Regression:
-    split_dataset:
-      test_size: 0.2
-      random_state: 42
-      stratify_for_classification: true
-    handle_missing_values:
-      numerical_strategy:
-        strategy: mean
-        imputer: SimpleImputer
-      categorical_strategy:
-        strategy: most_frequent
-        imputer: SimpleImputer
-        fill_value: "Missing"
-    test_normality:
-      p_value_threshold: 0.05
-      skewness_threshold: 1.0
-      use_p_value_other_models: false
-    handle_outliers:
-      zscore_threshold: 3
-      iqr_multiplier: 1.5
-      apply_zscore: false
-      apply_iqr: true
-      apply_winsor: false
-      winsor_limits: [0.05, 0.05]
-      apply_isolation_forest: false
-      contamination: 0.05
-    choose_transformations:
-      method: power
-      power_method: yeo-johnson
-      skewness_threshold: 1.0
-    encode_categoricals:
-      ordinal_encoding: OrdinalEncoder
-      nominal_encoding: OneHotEncoder
-      handle_unknown: ignore
-    apply_scaling:
-      method: StandardScaler
-    implement_smote:
-      variant: SMOTENC
-      params:
-        k_neighbors: 5
-        sampling_strategy: 'auto'
-    inverse_transformations:
-      inverse_scaling: true
-      inverse_transformation: true
-      inverse_encoding: true
-    debug_split_dataset: true
-    debug_handle_missing_values: true
-    debug_test_normality: true
-    debug_handle_outliers: true
-    debug_choose_transformations: true
-    debug_encode_categoricals: true
-    debug_apply_scaling: true
-    debug_implement_smote: true
-    debug_final_inverse_transformations: true
-    debug_validate_inverse_transformations: true
-    debug_generate_recommendations: true
-
-  K-Means:
-    split_dataset:
-      test_size: null
-      random_state: 42
-      stratify_for_classification: false
-    handle_missing_values:
-      numerical_strategy:
-        strategy: mean
-        imputer: SimpleImputer
-      categorical_strategy:
-        strategy: most_frequent
-        imputer: SimpleImputer
-        fill_value: "Missing"
-    test_normality:
-      p_value_threshold: 0.05
-      skewness_threshold: 1.0
-      use_p_value_other_models: false
-    handle_outliers:
-      zscore_threshold: 3
-      iqr_multiplier: 1.5
-      apply_zscore: true
-      apply_iqr: true
-      apply_winsor: false
-      apply_isolation_forest: false
-      contamination: 0.05
-    choose_transformations:
-      method: power
-      power_method: yeo-johnson
-      skewness_threshold: 1.0
-    encode_categoricals:
-      ordinal_encoding: OrdinalEncoder
-      nominal_encoding: OrdinalEncoder
-      handle_unknown: ignore
-    apply_scaling:
-      method: MinMaxScaler
-    implement_smote:
-      variant: null
-      params: {}
-    inverse_transformations:
-      inverse_scaling: true
-      inverse_transformation: true
-      inverse_encoding: true
-    clustering_model_params:
-      n_clusters: 3
-      init: 'k-means++'
-      n_init: 10
-      max_iter: 300
-    debug_split_dataset: true
-    debug_handle_missing_values: true
-    debug_test_normality: true
-    debug_handle_outliers: true
-    debug_choose_transformations: true
-    debug_encode_categoricals: true
-    debug_apply_scaling: true
-    debug_implement_smote: false
-    debug_final_inverse_transformations: true
-    debug_validate_inverse_transformations: true
-    debug_generate_recommendations: true
-
-  Linear Regression:
-    split_dataset:
-      test_size: 0.2
-      random_state: 42
-      stratify_for_classification: false
-    handle_missing_values:
-      numerical_strategy:
-        strategy: mean
-        imputer: SimpleImputer
-      categorical_strategy:
-        strategy: most_frequent
-        imputer: SimpleImputer
-        fill_value: "Missing"
-    test_normality:
-      p_value_threshold: 0.05
-      skewness_threshold: 1.0
-      use_p_value_other_models: false
-    handle_outliers:
-      zscore_threshold: 3
-      iqr_multiplier: 1.5
-      apply_zscore: true
-      apply_iqr: true
-      apply_winsor: false
-      winsor_limits: [0.05, 0.05]
-      apply_isolation_forest: false
-      contamination: 0.05
-    choose_transformations:
-      method: power
-      power_method: yeo-johnson
-      skewness_threshold: 1.0
-    encode_categoricals:
-      ordinal_encoding: OrdinalEncoder
-      nominal_encoding: OneHotEncoder
-      handle_unknown: ignore
-    apply_scaling:
-      method: StandardScaler
-    implement_smote:
-      variant: null
-      params: {}
-    inverse_transformations:
-      inverse_scaling: true
-      inverse_transformation: true
-      inverse_encoding: true
-    debug_split_dataset: true
-    debug_handle_missing_values: true
-    debug_test_normality: true
-    debug_handle_outliers: true
-    debug_choose_transformations: true
-    debug_encode_categoricals: true
-    debug_apply_scaling: true
-    debug_implement_smote: false
-    debug_final_inverse_transformations: true
-    debug_validate_inverse_transformations: true
-    debug_generate_recommendations: true
-
-  Tree Based Regressor:
-    split_dataset:
-      test_size: 0.2
-      random_state: 42
-      stratify_for_classification: false
-    handle_missing_values:
-      numerical_strategy:
-        strategy: median
-        imputer: SimpleImputer
-      categorical_strategy:
-        strategy: most_frequent
-        imputer: SimpleImputer
-        fill_value: "Missing"
-    test_normality:
-      p_value_threshold: 0.05
-      skewness_threshold: 1.0
-      use_p_value_other_models: false
-    handle_outliers:
-      zscore_threshold: 3
-      iqr_multiplier: 1.5
-      apply_zscore: false
-      apply_iqr: true
-      apply_winsor: false
-      winsor_limits: [0.05, 0.05]
-      apply_isolation_forest: false
-      contamination: 0.05
-    choose_transformations:
-      method: none
-      skewness_threshold: 1.0
-    encode_categoricals:
-      ordinal_encoding: OrdinalEncoder
-      nominal_encoding: OneHotEncoder
-      handle_unknown: ignore
-    apply_scaling:
-      method: none
-    implement_smote:
-      variant: null
-      params: {}
-    inverse_transformations:
-      inverse_scaling: true
-      inverse_transformation: true
-      inverse_encoding: true
-    debug_split_dataset: true
-    debug_handle_missing_values: true
-    debug_test_normality: true
-    debug_handle_outliers: true
-    debug_choose_transformations: true
-    debug_encode_categoricals: true
-    debug_apply_scaling: true
-    debug_implement_smote: false
-    debug_final_inverse_transformations: true
-    debug_validate_inverse_transformations: true
-    debug_generate_recommendations: true
-
-  Support Vector Machine:
-    split_dataset:
-      test_size: 0.2
-      random_state: 42
-      stratify_for_classification: true
-    handle_missing_values:
-      numerical_strategy:
-        strategy: mean
-        imputer: KNNImputer
-        knn_neighbors: 5
-      categorical_strategy:
-        strategy: constant
-        imputer: SimpleImputer
-        fill_value: "Unknown"
     test_normality:
       p_value_threshold: 0.05
       skewness_threshold: 1.0
@@ -425,10 +177,49 @@ models:
 
 # --- New time series section for LSTM models ---
 time_series:
+  time_series_model_type: "classifier" # or regressor
   enabled: true
-  time_column: "frame_time"         # This must match the column name in the updated dataset.
-  window_size: 30                   # Default sequence length (can be dynamically estimated if needed)
-  horizon: 1                        # Number of future time steps to predict.
+  time_column: "biomech_datetime"         # This must match the column name in the updated dataset.
+  horizon: 24                        # Number of future time steps to predict. For DTW/Pad can be overriden below to match sequence lengths for max horizon
   step_size: 1                      # Stride for the sliding window.
-  max_sequence_length: 30           # Optional: pad sequences to this length if needed.
-  use_dtw: false                    # Set to true to enable DTW alignment.
+  ts_outlier_handling_method: "none" # "median", "mean", or "none"
+  ts_sequence_mode: "dtw" # "set_window", "pad", "dtw", "variable_length"
+  sequence_modes:
+    set_window:
+      window_size: 30              # Fixed window size for all sequences
+      max_sequence_length: 30      # Maximum allowed sequence length
+      
+    pad:
+      padding_side: "post"        # Pad at end of sequences
+      pad_threshold: 0.2          # Pad threshold for sequences
+      match_horizon_and_seq_length: true #For DTW/Pad this should be around the same length as the categorical
+
+    dtw:
+      use_dtw: true              # Enable DTW alignment
+      reference_sequence: "max"  # Use mean sequence as reference
+      dtw_threshold: 0.2          # DTW threshold for sequences
+      match_horizon_and_seq_length: true # For DTW/Pad this should be around the same length as the categorical
+      
+    variable_length:
+
+  # SMOTE-TS configuration
+  apply_smote_ts: true  # Master toggle for SMOTE-TS
+  smote_ts_config:
+    k_neighbors: 5      # Number of neighbors for interpolation
+    random_state: 42    # For reproducibility
+    min_imbalance_ratio: 0.8  # Only apply when imbalance is worse than this
+    preserve_phases: true  # Whether to preserve phase boundaries
+  # --- New options for PSI-based processing ---
+  psi_feature_selection:
+    enabled: true              # Enable PSI-based feature selection
+    threshold: 0.25            # PSI threshold for dropping features
+    split_frac: 0.75           # Use 75% of the data as the reference (earlier) period
+    split_distinct: false      # Whether to split based on unique time values (false means row count)
+    cut_off: null              # Optionally provide a specific cutoff date (in proper format)
+    apply_before_split: true   # Apply PSI selection before the train/test split
+
+  feature_engine_split:
+    enabled: true              # Enable the alternative splitting using feature-engine
+    split_frac: 0.75           # Use 75% of data as the reference (train) set
+    split_distinct: false      # Whether to split based on unique time values
+    cut_off: null              # Optionally specify a cutoff date for splitting

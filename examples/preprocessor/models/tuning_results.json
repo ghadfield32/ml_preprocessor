@@ -7,16 +7,16 @@
             "max_features": "log2",
             "min_samples_leaf": 1,
             "min_samples_split": 2,
-            "n_estimators": 87
+            "n_estimators": 81
         },
-        "Best CV Score": -0.43815564717764144,
+        "Best CV Score": -0.43632099659227885,
         "Evaluation Metrics": {
             "accuracy": 0.72,
             "precision": 0.708421052631579,
             "recall": 0.72,
             "f1_score": 0.7130145530145531,
-            "roc_auc": 0.7182539682539683,
-            "log_loss": 0.556339506304983
+            "roc_auc": 0.7103174603174603,
+            "log_loss": 0.5496772317865134
         }
     },
     "Decision Tree": {
@@ -39,7 +39,7 @@
     },
     "Best Model": {
         "model_name": "Random Forest",
-        "metric_value": 0.556339506304983,
+        "metric_value": 0.5496772317865134,
         "path": "C:\\Users\\ghadf\\vscode_projects\\docker_projects\\ml_preprocessor\\examples\\preprocessor\\models\\Random_Forest\\trained_model.pkl"
     }
 }

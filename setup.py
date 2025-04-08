@@ -39,6 +39,7 @@ setup(
         "seaborn",
         "scipy",
         "joblib",
+        "feature-engine",
         # Add any additional dependencies your package requires
     ],
     classifiers=[

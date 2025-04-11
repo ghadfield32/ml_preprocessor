@@ -18,7 +18,7 @@ def read_long_description():
 # Define the setup configuration
 setup(
     name="datapreprocessor",  # Replace with your desired package name
-    version="0.1.0",
+    version="0.2.0",
     author="Your Name",  # Replace with your name
     author_email="your.email@example.com",  # Replace with your email
     description="A comprehensive data preprocessing package for machine learning models.",

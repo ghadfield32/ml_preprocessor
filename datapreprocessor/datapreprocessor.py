@@ -564,15 +564,7 @@ class DataPreprocessor:
             self.logger.debug(f"No secondary grouping, returning default phase{context_str}")
             return {"default_phase": ("default_phase", group_data.values)}
         
-        if 'pitch_phase_biomech' in group_data.columns:
-            unique_phases = group_data['pitch_phase_biomech'].unique()
-            self.logger.debug(f"Raw phases in group{context_str}: {unique_phases}")
-            raw_phase_counts = group_data['pitch_phase_biomech'].value_counts().to_dict()
-            self.logger.debug(f"Phase sample counts{context_str}: {raw_phase_counts}")
-            for phase in unique_phases:
-                norm_value = self.normalize_phase_key(str(phase))
-                self.logger.debug(f"Normalization test{context_str}: '{phase}' → '{norm_value}'")
-        
+
         phase_groups = list(group_data.groupby(self.sub_sequence_categorical))
         subphases = {}
         MIN_PHASE_SAMPLES = 2 if self.mode == 'predict' else (2 if not skip_min_samples else 1)
@@ -621,19 +613,6 @@ class DataPreprocessor:
         self.logger.debug(f"Completed segmentation. Normalized phase keys obtained: {list(subphases.keys())}")
         expected_set = set(self.get_phase_order(context=context))
         self.logger.debug(f"Expected phase keys: {expected_set}")
-        
-        missing_phases = expected_set - set(subphases.keys())
-        if missing_phases:
-            self.logger.warning(f"Missing expected phases after segmentation{context_str}: {missing_phases}")
-            for phase in missing_phases:
-                original_phases = [p for p in unique_phases if hasattr(p, 'lower') and self.normalize_phase_key(str(p)) == phase]
-                if original_phases:
-                    self.logger.warning(f"Phase '{phase}'{context_str} was present as {original_phases} but filtered out")
-                    for orig_phase in original_phases:
-                        phase_data = group_data[group_data['pitch_phase_biomech'] == orig_phase]
-                        self.logger.warning(f"  - Raw phase '{orig_phase}' had {len(phase_data)} samples (min required: {MIN_PHASE_SAMPLES})")
-                else:
-                    self.logger.warning(f"Phase '{phase}'{context_str} not found in raw data")
         
         if not subphases:
             self.logger.error("No valid subphases detected in this group.")
@@ -3300,11 +3279,7 @@ class DataPreprocessor:
         # NEW: Reset cumulative target values per session if the option is enabled.
         data_sorted = self.reset_cumulative_per_session(data_sorted)
         
-        # Log unique phase values (if applicable)
-        if 'pitch_phase_biomech' in data_sorted.columns:
-            all_unique_phases = data_sorted['pitch_phase_biomech'].unique()
-            self.logger.debug(f"All unique phase values in dataset: {all_unique_phases}")
-        
+
         # 3. Split data.
         ts_split_options = self.options.get('time_series_split', {})
         if ts_split_options.get('method') == "sequence_aware":
